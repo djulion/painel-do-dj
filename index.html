@@ -170,7 +170,10 @@ body.com-tk .app{padding-bottom:calc(env(safe-area-inset-bottom) + 74px)}
 .boom .ey{font-family:"Barlow Condensed",-apple-system,system-ui,sans-serif;font-weight:700;letter-spacing:.22em;font-size:clamp(14px,3.6vw,26px);opacity:.92}
 .boom .nome{font-family:"Barlow Condensed",-apple-system,system-ui,sans-serif;font-weight:700;font-size:clamp(46px,13vw,140px);line-height:.95;margin:10px 0 0;text-shadow:0 6px 40px rgba(0,0,0,.35);text-wrap:balance}
 .boom .vence{font-family:"Barlow Condensed",-apple-system,system-ui,sans-serif;font-weight:700;font-size:clamp(30px,8vw,84px);line-height:1;letter-spacing:.06em}
-.boom .num{display:flex;justify-content:center;gap:clamp(14px,4vw,48px);flex-wrap:wrap;margin:20px 0 6px}
+.boom .num{display:grid;grid-template-columns:repeat(4,auto);justify-content:center;gap:clamp(12px,3.5vw,48px);margin:20px 0 6px}
+@media (max-width:640px){.boom .num{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:16px}}
+.boom .num .dest b{color:#fff;text-shadow:0 0 24px rgba(255,255,255,.55)}
+.boom .num .dest span{opacity:1;font-weight:700}
 .boom .num div{min-width:0}
 .boom .num b{display:block;font-family:"Barlow Condensed",-apple-system,system-ui,sans-serif;font-size:clamp(30px,8vw,64px);line-height:1;font-variant-numeric:tabular-nums}
 .boom .num span{font-size:clamp(11px,2.8vw,15px);opacity:.85;letter-spacing:.06em;text-transform:uppercase}
@@ -492,10 +495,14 @@ function explodir(info){
   $("boom-ey").textContent=info.garantia?"VITÓRIA MATEMATICAMENTE GARANTIDA":"O PAINEL DO DJ CRAVOU";
   $("boom-nome").textContent=info.nome.toUpperCase();
   $("boom-vence").textContent="VENCE";
-  $("boom-num").innerHTML=`<div><b>${pct(info.proj)}</b><span>projeção</span></div><div><b>${pct(info.chance,info.chance>0.995?1:0)}</b><span>chance</span></div><div><b>${pct(info.pst,1)}</b><span>urnas apuradas</span></div>`;
+  const hora=h=>{const m=String(h||"").match(/(\d{1,2}):(\d{2})/);return m?`${m[1].padStart(2,"0")}:${m[2]}`:"—";};
+  const caixa=(v,r,cls="")=>`<div class="${cls}"><b>${v}</b><span>${r}</span></div>`;
+  $("boom-num").innerHTML=info.garantia
+    ? caixa(hora(info.hc),"cravado às","dest")+caixa(pct(info.pc,1),"das urnas na hora","dest")+caixa(hora(info.hm),"garantia matemática")+caixa(pct(info.proj),"projeção")
+    : caixa(hora(info.hc),"cravado às","dest")+caixa(pct(info.pc,1),"das urnas apuradas","dest")+caixa(pct(info.proj),"projeção")+caixa(pct(info.chance,info.chance>0.995?1:0),"chance");
   $("boom-linha").innerHTML=info.garantia
-    ?`Garantia matemática às <b>${hhmm(info.hm)}</b>. O painel tinha cravado às <b>${hhmm(info.hc)}</b>, com ${pct(info.pc,1)} das urnas.`
-    :`Cravado às <b>${hhmm(info.hc)}</b> (horário do TSE) · faixa provável de ${pct(info.lo)} a ${pct(info.hi)}`;
+    ?`Faixa provável final: ${pct(info.lo)} a ${pct(info.hi)}`
+    :`Faixa provável: ${pct(info.lo)} a ${pct(info.hi)} · horário do TSE`;
   $("boom-gan").innerHTML=(info.garantia&&info.antes?`<span class="gan">O Painel do DJ cravou ${info.antes} antes</span>`:"")
     +(info.garantia?`<div class="linha" style="font-size:13px;opacity:.75">Pela conta do painel, a vantagem já supera todos os votos que faltam. Resultado oficial: TSE.</div>`
                    :`<div class="linha" style="font-size:13px;opacity:.75">Projeção estatística do Painel do DJ. Resultado oficial: TSE.</div>`);
@@ -579,7 +586,7 @@ setInterval(()=>{
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)tick();});
 window.addEventListener("hashchange",()=>location.reload());
 $("cheia").onclick=()=>{const e=document.documentElement; if(!document.fullscreenElement){(e.requestFullscreen||e.webkitRequestFullscreen||(()=>{})).call(e);}else{document.exitFullscreen&&document.exitFullscreen();}};
-const VERSAO="6";
+const VERSAO="7";
 async function checarVersao(){try{const r=await fetch("versao.txt?"+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==VERSAO)location.replace(location.pathname+"?v="+v+location.hash);}catch(e){}}
 setInterval(checarVersao,120000); setTimeout(checarVersao,4000);
