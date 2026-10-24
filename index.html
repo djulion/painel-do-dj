@@ -83,17 +83,99 @@ svg text{font-family:Barlow,system-ui,sans-serif}
 .tab.on{color:var(--txt);border-color:var(--mut2)}
 .rodape{text-align:center;font-size:12px;color:var(--mut2);margin-top:14px;line-height:1.5}
 .btn{background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:6px 10px;font-size:13px;font-weight:600}
+
+/* assinatura */
+.por{font-size:11px;letter-spacing:.14em;color:var(--mut2);font-weight:600;margin-left:6px}
+.dakia{margin-top:10px;font-size:12px;color:var(--mut)}
+.dakia b{font-family:"Barlow Condensed",-apple-system,system-ui,sans-serif;letter-spacing:.16em;font-size:14px;background:linear-gradient(90deg,var(--lula),var(--flavio));-webkit-background-clip:text;background-clip:text;color:transparent}
+/* selo: o momento em que o painel cravou */
+.selo{border-radius:18px;padding:14px 16px;margin-bottom:12px;border:2px solid transparent;
+  background:linear-gradient(var(--card),var(--card)) padding-box,linear-gradient(90deg,var(--lula),var(--flavio)) border-box}
+.selo.espera{background:var(--card) padding-box;border:1px dashed var(--line)}
+.selo .ey{font-size:11px;letter-spacing:.16em;font-weight:700;color:var(--mut)}
+.selo .t{font-family:"Barlow Condensed",-apple-system,system-ui,sans-serif;font-weight:700;font-size:28px;line-height:1.1;margin:4px 0;text-wrap:balance}
+.selo.espera .t{font-size:19px;color:var(--mut)}
+.selo .s{font-size:14px;color:var(--mut);line-height:1.45}
+.selo .s b{color:var(--txt)}
+.selo .gan{display:inline-block;margin-top:8px;padding:4px 10px;border-radius:999px;background:rgba(45,212,160,.14);color:var(--ok);font-weight:700;font-size:13px}
+/* mapa do Brasil em quadrados */
+.mapa{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));grid-template-rows:repeat(8,auto);gap:5px;margin-top:10px}
+.tile{aspect-ratio:1;border-radius:9px;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:var(--card2);border:1px solid var(--line);cursor:pointer;overflow:hidden;transition:background-color .6s;padding:0;color:var(--txt);font:inherit}
+.tile b{font-family:"Barlow Condensed",-apple-system,system-ui,sans-serif;font-size:16px;line-height:1}
+.tile small{font-size:10.5px;line-height:1.1;font-variant-numeric:tabular-nums;opacity:.92}
+.tile .ap{position:absolute;left:0;bottom:0;height:3px;background:var(--warn);transition:width .6s}
+.tile.sel{outline:2px solid var(--txt);outline-offset:1px}
+.tile:focus-visible{outline:2px solid var(--warn)}
+.map-leg{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11px;color:var(--mut);margin-top:10px;flex-wrap:wrap}
+.escala{display:flex;height:8px;border-radius:5px;overflow:hidden;width:140px}
+.escala i{flex:1}
+.map-det{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--card2);font-size:14px;line-height:1.5;min-height:44px}
+.map-det .nm{font-family:"Barlow Condensed",-apple-system,system-ui,sans-serif;font-weight:700;font-size:18px}
+/* quanto falta para virar */
+.vir .frase{font-family:"Barlow Condensed",-apple-system,system-ui,sans-serif;font-weight:700;font-size:24px;line-height:1.15;margin:4px 0 10px;text-wrap:balance}
+.need{position:relative;height:16px;border-radius:9px;background:var(--line);margin:18px 0 22px}
+.need .cur{position:absolute;top:0;bottom:0;left:0;border-radius:9px;transition:width .6s}
+.need .alvo{position:absolute;top:-6px;bottom:-6px;width:3px;margin-left:-1.5px;background:var(--txt);border-radius:2px;transition:left .6s}
+.need .alvo span,.need .cur span{position:absolute;white-space:nowrap;font-size:11px;font-weight:600;color:var(--mut)}
+.need .alvo span{top:-17px;transform:translateX(-50%)}
+.need .cur span{bottom:-18px;right:0}
+.vir .tag{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.tag.ok{background:rgba(45,212,160,.14);color:var(--ok)} .tag.dif{background:rgba(245,181,63,.15);color:var(--warn)} .tag.imp{background:rgba(239,75,75,.14);color:var(--lula)}
+/* atualização chegando */
+@keyframes brilho{0%{box-shadow:0 0 0 0 rgba(245,181,63,.55)}100%{box-shadow:0 0 0 14px rgba(245,181,63,0)}}
+.card.pisca{animation:brilho .9s ease-out}
+@media (prefers-reduced-motion:reduce){.card.pisca,.dot{animation:none}.split i,.apurbar i,.tile,.tile .ap,.need .cur,.need .alvo{transition:none}}
+/* modo estúdio (tela larga: TV, computador, transmissão) */
+.so-estudio{display:none}
+@media (min-width:1100px){
+  .app{max-width:1680px;padding-left:max(28px,env(safe-area-inset-left,0px));padding-right:max(28px,env(safe-area-inset-right,0px))}
+  .cols{display:grid;grid-template-columns:1fr 1.08fr 1fr;gap:16px;align-items:start}
+  .so-estudio{display:inline-block}
+  .top h1{font-size:34px} .marca{font-size:16px}
+  .cand .nm{font-size:26px} .cand .vt{font-size:15px}
+  .veredito{font-size:30px} .selo .t{font-size:40px} .selo .s{font-size:16px}
+  .tile b{font-size:22px} .tile small{font-size:13px} .mapa{gap:7px}
+  .vir .frase{font-size:30px}
+}
+
+/* barra de notícias (estilo TV) */
+.tk{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;align-items:stretch;background:var(--card);border-top:1px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+.tk[hidden]{display:none!important}
+.tk .rot{flex:none;display:flex;align-items:center;padding:0 12px;color:#fff;font-family:"Barlow Condensed",-apple-system,system-ui,sans-serif;font-weight:700;font-size:14px;letter-spacing:.08em;
+  background:linear-gradient(90deg,var(--lula),var(--flavio))}
+.tk .trilho{flex:1;overflow:hidden;white-space:nowrap;padding:11px 0;font-size:15px}
+.tk .rolo{display:inline-block;padding-left:100%;animation:rolar 60s linear infinite;will-change:transform}
+.tk .it{margin-right:46px}
+.tk .it em{font-style:normal;color:var(--mut2);font-variant-numeric:tabular-nums;margin-right:6px}
+.tk .it i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:1px;background:var(--warn)}
+.tk .it.f i{background:var(--flavio)} .tk .it.l i{background:var(--lula)}
+@keyframes rolar{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+@media (prefers-reduced-motion:reduce){.tk .rolo{animation:none;padding-left:12px}}
+body.com-tk .app{padding-bottom:calc(env(safe-area-inset-bottom) + 74px)}
+@media (min-width:1100px){.tk .trilho{font-size:20px;padding:14px 0}.tk .rot{font-size:18px;padding:0 18px}}
+@media (max-width:1099px){.cand .pc{font-size:clamp(36px,11vw,54px)}}
+@media (min-width:1100px){.cand .pc{font-size:min(4.6vw,92px)}}
 </style>
 </head>
 <body>
 <div class="app">
   <div class="top">
-    <div><div class="marca">PAINEL DO DJ</div><h1 class="cond">2º turno · Presidente</h1></div>
+    <div><div class="marca">PAINEL DO DJ</div><span class="por">por DAKIA</span><h1 class="cond">2º turno · Presidente</h1></div>
     <div class="live"><span class="dot" id="dot"></span><span id="hora">conectando…</span></div>
   </div>
   <div id="avisos"></div>
 
-  <div class="card">
+  <div class="selo espera" id="selo">
+    <div class="ey" id="selo-ey">O PAINEL DO DJ CRAVA O VENCEDOR AQUI</div>
+    <div class="t" id="selo-t">Quando a chance de vitória passar de 99%, a projeção fica registrada com a hora.</div>
+    <div class="s" id="selo-s">Depois o painel mostra quanto tempo antes da garantia matemática ele acertou.</div>
+  </div>
+
+  <div class="cols">
+  <div class="col">
+  <div class="card" id="c-placar">
     <div class="placar">
       <div class="cand"><div class="nm lula">LULA</div><div class="pc lula" id="pl">—</div><div class="vt" id="vl">—</div></div>
       <div class="cand r"><div class="nm flavio">FLÁVIO</div><div class="pc flavio" id="pf">—</div><div class="vt" id="vf">—</div></div>
@@ -124,7 +206,26 @@ svg text{font-family:Barlow,system-ui,sans-serif}
       <div class="kv"><span>Municípios já no modelo</span><b id="kn">—</b></div>
     </div>
   </div>
+  </div>
 
+  <div class="col">
+  <div class="card">
+    <div class="lbl">O Brasil agora</div>
+    <div class="mapa" id="mapa"></div>
+    <div class="map-leg"><span>Cor: quem lidera na projeção do estado (mais forte = vantagem maior) · barra amarela: % apurado</span>
+      <span class="escala"><i style="background:var(--lula)"></i><i style="background:rgba(239,75,75,.45)"></i><i style="background:var(--card2)"></i><i style="background:rgba(59,134,246,.45)"></i><i style="background:var(--flavio)"></i></span></div>
+    <div class="map-det" id="mapdet">Toque num estado para ver os números dele.</div>
+  </div>
+
+  <div class="card vir" id="c-vir">
+    <div class="lbl">Quanto falta para virar</div>
+    <div class="frase" id="vir-f">Aguardando os primeiros votos…</div>
+    <div class="need" id="vir-bar" hidden><div class="cur" id="vir-cur"><span id="vir-curl"></span></div><div class="alvo" id="vir-alvo"><span id="vir-alvol"></span></div></div>
+    <div class="s" id="vir-s" style="font-size:13px;color:var(--mut);line-height:1.45"></div>
+  </div>
+  </div>
+
+  <div class="col">
   <div class="card">
     <div class="lbl">Ao longo da noite (Flávio, % dos válidos)</div>
     <svg viewBox="0 0 340 190" id="chart" style="width:100%;margin-top:8px"></svg>
@@ -135,14 +236,19 @@ svg text{font-family:Barlow,system-ui,sans-serif}
     <div class="tabs"><div class="tab on" data-t="reg">Regiões</div><div class="tab" data-t="uf">Estados</div></div>
     <div id="lista"></div>
   </div>
+  </div>
+  </div>
 
   <div class="rodape">
-    Atualiza sozinho a cada 15 s · <span id="ult">—</span><br>
+    Atualiza sozinho · <span id="ult">—</span><br>
     Votos: TSE (resultado oficial em resultados.tse.jus.br)<br>
     Projeção e chances: estimativa estatística não oficial do Painel do DJ<br><br>
-    <button class="btn" id="tema">Tema claro</button>
+    <button class="btn" id="tema">Tema claro</button> <button class="btn so-estudio" id="cheia">Tela cheia</button>
+    <div class="dakia">Desenvolvido por <b>DAKIA</b><br>Djulion Andgili Kolberg Inteligência Aplicada</div>
   </div>
 </div>
+
+<div class="tk" id="tk" hidden><div class="rot">AO VIVO</div><div class="trilho"><span class="rolo" id="tk-rolo"></span></div></div>
 
 <script>
 const $=id=>document.getElementById(id);
@@ -210,6 +316,112 @@ function lista(d){
 }
 function REG(u){const R={ac:"N",am:"N",ap:"N",pa:"N",ro:"N",rr:"N",to:"N",al:"NE",ba:"NE",ce:"NE",ma:"NE",pb:"NE",pe:"NE",pi:"NE",rn:"NE",se:"NE",df:"CO",go:"CO",ms:"CO",mt:"CO",es:"SE",mg:"SE",rj:"SE",sp:"SE",pr:"S",rs:"S",sc:"S"};return R[u]||"EX";}
 
+
+// ===== mapa do Brasil em quadrados (linha, coluna)
+const POS={rr:[0,2],ap:[0,4],am:[1,1],pa:[1,3],ma:[1,4],ce:[1,5],rn:[1,6],ac:[2,0],ro:[2,1],mt:[2,2],to:[2,3],pi:[2,4],pe:[2,5],pb:[2,6],
+  go:[3,2],df:[3,3],ba:[3,4],se:[3,5],al:[3,6],ms:[4,2],mg:[4,3],es:[4,4],pr:[5,1],sp:[5,2],rj:[5,3],sc:[6,1],zz:[6,5],rs:[7,1]};
+let UFSEL=null;
+function rgba(hex,a){const h=hex.replace("#","");const n=parseInt(h.length===3?h.split("").map(c=>c+c).join(""):h,16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`;}
+function mapa(d){
+  const box=$("mapa"); const por={}; (d.ufs||[]).forEach(u=>por[u.uf]=u);
+  if(!box.children.length){
+    box.innerHTML=Object.entries(POS).map(([u,[r,c]])=>`<button class="tile" id="t-${u}" style="grid-row:${r+1};grid-column:${c+1}" aria-label="${u.toUpperCase()}"><b>${u==="zz"?"EX":u.toUpperCase()}</b><small></small><i class="ap"></i></button>`).join("");
+    box.querySelectorAll(".tile").forEach(t=>t.onclick=()=>{UFSEL=t.id.slice(2);if(D)mapa(D);});
+  }
+  const cL=css("--lula"), cF=css("--flavio");
+  for(const u in POS){
+    const t=$("t-"+u), x=por[u]||{}; const v=x.proj!=null?x.proj:x.f;
+    if(v==null){t.style.backgroundColor="";t.style.color="";t.querySelector("small").textContent="";}
+    else{ const m=Math.abs(v-0.5), a=0.22+0.78*Math.min(1,m/0.15);
+      t.style.backgroundColor=rgba(v>=0.5?cF:cL,a); t.style.color=a>0.55?"#fff":"";
+      t.querySelector("small").textContent=pct(v>=0.5?v:1-v,0); }
+    t.querySelector(".ap").style.width=((x.pst||0)*100)+"%";
+    t.classList.toggle("sel",u===UFSEL);
+  }
+  if(UFSEL&&por[UFSEL]){const x=por[UFSEL];
+    const lid=x.proj==null?null:(x.proj>=0.5?"Flávio":"Lula");
+    $("mapdet").innerHTML=`<span class="nm">${x.nome}</span> · ${pct(x.pst||0,0)} apurado<br>
+      Nas urnas: <span class="lula">Lula ${pct(x.f==null?null:1-x.f)}</span> x <span class="flavio">Flávio ${pct(x.f)}</span><br>
+      ${lid?`Projeção: <b class="${lid==="Lula"?"lula":"flavio"}">${lid} ${pct(lid==="Lula"?1-x.proj:x.proj)}</b> (faixa ${pct(lid==="Lula"?1-x.hi:x.lo)} a ${pct(lid==="Lula"?1-x.lo:x.hi)}) · chance de ${lid} vencer no estado: <b>${pct(lid==="Lula"?1-x.p:x.p,0)}</b>`:"Projeção aparece com os primeiros municípios."}
+      ${x.d1t!=null?`<br>Flávio vs 1º turno nos mesmos locais: <b class="${x.d1t>0?"pos":"neg"}">${pp(x.d1t)}</b>`:""}`;
+  }
+}
+
+// ===== quanto falta para virar
+const VV1T=119300788; // votos válidos no 1º turno de 2026 (TSE)
+function totalEsperado(d){return VV1T*((d.modelo&&d.modelo.rho)||1);}
+function virada(d){
+  const b=d.br; if(!b||!b.vv){$("vir-bar").hidden=true;return;}
+  const total=Math.max(totalEsperado(d),b.vv), R=Math.max(0,total-b.vv);
+  const lead=Math.abs(b.flavio-b.lula), lidF=b.flavio>=b.lula, lider=lidF?"Flávio":"Lula", atras=lidF?"Lula":"Flávio";
+  const corA=lidF?css("--lula"):css("--flavio"), clsA=lidF?"lula":"flavio";
+  const shareA=(lidF?b.lula:b.flavio)/b.vv;
+  if(lead>=R){
+    $("vir-f").innerHTML=`Não dá mais para virar: mesmo com todos os votos que faltam, <span class="${clsA}">${atras}</span> não alcança <span class="${lidF?"flavio":"lula"}">${lider}</span>.`;
+    $("vir-bar").hidden=true;
+    $("vir-s").innerHTML=`<span class="tag imp">Vitória matematicamente garantida (estimativa)</span><br>Vantagem de ${num(lead)} votos; restam cerca de ${(R/1e6).toLocaleString("pt-BR",{maximumFractionDigits:1})} milhões a apurar.`;
+    return;
+  }
+  const x=(lead+R)/(2*R);
+  const mi=(R/1e6).toLocaleString("pt-BR",{maximumFractionDigits:1});
+  $("vir-f").innerHTML=`Faltam cerca de ${mi} milhões de votos. Para virar, <span class="${clsA}">${atras}</span> precisa de <span class="${clsA}">${pct(x)}</span> deles.`;
+  $("vir-bar").hidden=false;
+  const X=v=>Math.max(0,Math.min(100,(v-0.30)/0.40*100)); // escala de 30% a 70%
+  $("vir-cur").style.width=X(shareA)+"%"; $("vir-cur").style.background=rgba(corA,.55); $("vir-curl").textContent=`faz ${pct(shareA)} agora`;
+  $("vir-alvo").style.left=X(Math.min(x,0.70))+"%"; $("vir-alvol").textContent=`precisa ${pct(x)}`;
+  const gap=x-shareA;
+  const tag=gap<=0.01?'<span class="tag ok">Virada possível</span>':gap<=0.05?'<span class="tag dif">Virada difícil</span>':'<span class="tag imp">Virada muito improvável</span>';
+  $("vir-s").innerHTML=`${tag}<br>${lider} lidera nas urnas por ${num(lead)} votos. Total de votos válidos estimado pelo comparecimento do 1º turno.`;
+}
+
+// ===== o momento em que o painel cravou
+function minutos(h){if(!h)return null;const m=String(h).match(/(\d{1,2}):(\d{2})/);if(!m)return null;let t=+m[1]*60+ +m[2];if(t<12*60)t+=24*60;return t;}
+function hhmm(h){const m=String(h||"").match(/(\d{1,2}):(\d{2})/);return m?`${m[1].padStart(2,"0")}h${m[2]}`:"—";}
+function selo(d){
+  const h=(d.hist||[]).filter(p=>p[4]!=null); let i0=-1, lado=null;
+  for(let i=h.length-1;i>=0;i--){const p=h[i][4]; const l=p>=0.99?"F":(p<=0.01?"L":null); if(!l||(lado&&l!==lado))break; lado=l; i0=i;}
+  const el=$("selo");
+  if(i0<0){el.className="selo espera"; $("selo-ey").textContent="O PAINEL DO DJ CRAVA O VENCEDOR AQUI";
+    $("selo-t").textContent="Quando a chance de vitória passar de 99%, a projeção fica registrada com a hora.";
+    $("selo-s").textContent="Depois o painel mostra quanto tempo antes da garantia matemática ele acertou."; return;}
+  const nome=lado==="F"?"Flávio Bolsonaro":"Lula", cls=lado==="F"?"flavio":"lula";
+  const hc=h[i0][5], pc=h[i0][0];
+  // garantia matemática: primeiro ponto em que a vantagem nas urnas supera todos os votos que faltam
+  const total=totalEsperado(d); let im=-1;
+  for(let i=i0;i<h.length;i++){const p=h[i]; if(p[1]==null)continue; const vv=total*p[0], lead=vv*Math.abs(2*p[1]-1), R=total-vv;
+    if(lead>=R&&((p[1]>=0.5)===(lado==="F"))){im=i;break;}}
+  const b=d.br; let hm=null, pm=null;
+  if(im>=0){hm=h[im][5];pm=h[im][0];}
+  else if(b&&b.vv){const R=Math.max(0,total-b.vv); if(Math.abs(b.flavio-b.lula)>=R&&((b.flavio>=b.lula)===(lado==="F"))){hm=d.hg&&d.hg[1];pm=b.pst;}}
+  el.className="selo"; $("selo-ey").textContent="O PAINEL DO DJ CRAVOU";
+  $("selo-t").innerHTML=`Projeção: <span class="${cls}">${nome}</span> vence`;
+  let s=`Cravado às <b>${hhmm(hc)}</b>, com <b>${pct(pc,1)}</b> das urnas apuradas.`;
+  if(hm){const dm=minutos(hm)-minutos(hc);
+    s+=`<br>Garantia matemática às <b>${hhmm(hm)}</b> (${pct(pm,0)} apurado).`;
+    if(dm>0) s+=`<br><span class="gan">O Painel do DJ cravou ${dm>=60?`${Math.floor(dm/60)}h${String(dm%60).padStart(2,"0")}`:`${dm} min`} antes</span>`;
+  } else s+=`<br>Aguardando a garantia matemática (quando não der mais para virar).`;
+  $("selo-s").innerHTML=s;
+}
+
+// ===== barra de notícias
+let tkAssin="";
+function ticker(d){
+  const ns=(d.noticias||[]).slice().reverse();
+  const el=$("tk");
+  if(!ns.length){el.hidden=true;document.body.classList.remove("com-tk");return;}
+  el.hidden=false; document.body.classList.add("com-tk");
+  const assin=ns.map(n=>n.h+n.txt).join("|"); if(assin===tkAssin) return; tkAssin=assin;
+  const esc=t=>String(t).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+  const lista=ns.slice(0,12);
+  const r=$("tk-rolo");
+  r.innerHTML=lista.map(n=>`<span class="it ${n.tipo}"><i></i><em>${esc(n.h)}</em>${esc(n.txt)}</span>`).join("");
+  const chars=lista.reduce((a,n)=>a+n.txt.length+12,0);
+  r.style.animationDuration=Math.max(25,Math.round(chars*0.16))+"s";
+  r.style.animation="none"; void r.offsetWidth; r.style.animation="";
+  r.style.animationDuration=Math.max(25,Math.round(chars*0.16))+"s";
+}
+
+let ultPst=null;
 function render(d){
   D=d;
   $("avisos").innerHTML=(d.erros||[]).filter(e=>!/atrasado/.test(e)).map(e=>`<div class="aviso">${e}</div>`).join("");
@@ -231,19 +443,26 @@ function render(d){
     const e=(id,x)=>{$(id).textContent=pp(x);$(id).className=x>0?"pos":x<0?"neg":"";}; e("k1",p.d1t); e("k22",p.d22);
     $("kn").textContent=d.modelo?`${num(d.modelo.n_obs)} de ${num(d.modelo.n_total)}`:"—";
   } else { gauge(null); }
-  grafico(d.hist||[]); lista(d);
+  grafico(d.hist||[]); lista(d); mapa(d); virada(d); selo(d); ticker(d);
+  if(b&&ultPst!=null&&b.pst!==ultPst){const c=$("c-placar");c.classList.remove("pisca");void c.offsetWidth;c.classList.add("pisca");}
+  ultPst=b?b.pst:null;
 }
 const SUPA="https://ihwdycrujrvpwvjfcioy.supabase.co", KEY="sb_publishable_-fE5D8rarCcGXt1FHHf5TA_SRIOZ483";
 const PID=(location.hash||"").replace("#","")==="demo"?"demo":"2t";
-let atualizado=0;
+let atualizado=0, carimbo=null;
 async function tick(){
   try{
-    const r=await fetch(`${SUPA}/rest/v1/painel?id=eq.${PID}&select=dados,atualizado`,{headers:{apikey:KEY},cache:"no-store"});
+    const h={headers:{apikey:KEY},cache:"no-store"};
+    const r=await fetch(`${SUPA}/rest/v1/painel?id=eq.${PID}&select=atualizado`,h);
     if(!r.ok) throw 0; const rows=await r.json(); ultimoOk=Date.now();
     if(!rows.length){ $("ver").textContent=PID==="2t"?"A apuração começa às 17h (Brasília). O painel liga um pouco antes.":"Demonstração ainda não iniciada."; $("ult").textContent="aguardando o painel"; return; }
     atualizado=Date.parse(rows[0].atualizado)||Date.now();
-    render(rows[0].dados);
-    if(!rows[0].dados.br&&PID==="2t") $("ver").textContent="Painel ligado. A apuração do TSE começa às 17h (Brasília).";
+    if(rows[0].atualizado===carimbo) return;
+    const r2=await fetch(`${SUPA}/rest/v1/painel?id=eq.${PID}&select=dados,atualizado`,h);
+    if(!r2.ok) throw 0; const rows2=await r2.json(); if(!rows2.length) return;
+    carimbo=rows2[0].atualizado; atualizado=Date.parse(carimbo)||atualizado;
+    render(rows2[0].dados);
+    if(!rows2[0].dados.br&&PID==="2t") $("ver").textContent="Painel ligado. A apuração do TSE começa às 17h (Brasília).";
   } catch(e){ $("dot").className="dot off"; }
 }
 setInterval(()=>{
@@ -255,6 +474,7 @@ setInterval(()=>{
 },1000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)tick();});
 window.addEventListener("hashchange",()=>location.reload());
+$("cheia").onclick=()=>{const e=document.documentElement; if(!document.fullscreenElement){(e.requestFullscreen||e.webkitRequestFullscreen||(()=>{})).call(e);}else{document.exitFullscreen&&document.exitFullscreen();}};
 aplicarTema(); tick(); setInterval(tick,15000);
 </script>
 </body>
