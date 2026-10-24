@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Painel do DJ</title>
+<meta name="apple-mobile-web-app-title" content="Painel do DJ">
+<link rel="apple-touch-icon" href="icone.png">
+<link rel="icon" href="icone.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b1220;--card:#131d33;--card2:#1a2742;--line:#243352;--txt:#eef3fb;--mut:#93a1bb;--mut2:#5f6e8a;
+  --lula:#ef4b4b;--flavio:#3b86f6;--ok:#2dd4a0;--warn:#f5b53f}
+:root[data-theme="light"]{--bg:#eef2f8;--card:#fff;--card2:#f3f6fb;--line:#dde3ee;--txt:#111a2c;--mut:#56637a;--mut2:#8792a6}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--txt);font-family:Barlow,-apple-system,system-ui,sans-serif}
+.cond{font-family:"Barlow Condensed",-apple-system,system-ui,sans-serif}
+.app{max-width:520px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 28px)}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.marca{font-family:"Barlow Condensed",-apple-system,system-ui,sans-serif;font-weight:700;font-size:13px;letter-spacing:.18em;background:linear-gradient(90deg,var(--lula),var(--flavio));-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:1px;display:inline-block}
+.top h1{font-size:22px;margin:0;font-weight:700}
+.live{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--mut)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 0 rgba(45,212,160,.6);animation:pulse 1.8s infinite}
+.dot.off{background:var(--warn);animation:none}
+@keyframes pulse{70%{box-shadow:0 0 0 8px rgba(45,212,160,0)}100%{box-shadow:0 0 0 0 rgba(45,212,160,0)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px}
+.lbl{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);font-weight:600}
+.aviso{background:rgba(245,181,63,.13);border-left:4px solid var(--warn);border-radius:10px;padding:9px 12px;font-size:13px;margin-bottom:12px}
+/* placar */
+.placar{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.cand .nm{font-family:"Barlow Condensed",-apple-system,system-ui,sans-serif;font-weight:700;font-size:19px}
+.cand .pc{font-family:"Barlow Condensed",-apple-system,system-ui,sans-serif;font-weight:700;font-size:clamp(36px,11vw,54px);line-height:1;margin-top:2px;white-space:nowrap}
+.cand .vt{font-size:13px;color:var(--mut)}
+.cand.r{text-align:right}
+.lula{color:var(--lula)} .flavio{color:var(--flavio)}
+.split{height:12px;border-radius:7px;overflow:hidden;display:flex;margin:14px 0 6px;background:var(--line);position:relative}
+.split i{display:block;height:100%;transition:width .6s}
+.split .meio{position:absolute;left:50%;top:-3px;bottom:-3px;width:2px;background:var(--txt);opacity:.7}
+.apur{display:flex;justify-content:space-between;font-size:13px;color:var(--mut)}
+.apurbar{height:6px;border-radius:4px;background:var(--line);margin-top:6px;overflow:hidden}
+.apurbar i{display:block;height:100%;background:var(--warn);transition:width .6s}
+/* projeção */
+.veredito{font-family:"Barlow Condensed",-apple-system,system-ui,sans-serif;font-weight:700;font-size:25px;line-height:1.15;margin:4px 0 12px}
+.gauge-wrap{position:relative;width:100%;max-width:300px;margin:0 auto}
+.gauge-wrap svg{width:100%;display:block}
+.gauge-txt{text-align:center;margin-top:4px}
+.gauge-txt .n{font-family:"Barlow Condensed",-apple-system,system-ui,sans-serif;font-weight:700;font-size:44px;line-height:1}
+.gauge-txt .s{font-size:13px;color:var(--mut)}
+.chs{display:flex;justify-content:space-between;font-size:14px;margin-top:6px;padding:0 6px}
+.faixa{margin-top:16px}
+.faixa .reg{position:relative;height:40px}
+.faixa .eixo{position:absolute;left:0;right:0;top:18px;height:4px;background:var(--line);border-radius:3px}
+.faixa .band{position:absolute;top:12px;height:16px;border-radius:8px;background:rgba(59,134,246,.30);transition:all .6s}
+.faixa .pt{position:absolute;top:8px;width:4px;height:24px;margin-left:-2px;border-radius:2px;background:var(--flavio);transition:left .6s}
+.faixa .cinq{position:absolute;top:2px;bottom:2px;left:50%;width:2px;background:var(--txt);opacity:.55}
+.faixa .ticks{display:flex;justify-content:space-between;font-size:11px;color:var(--mut2)}
+.kv{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.kv:last-child{border-bottom:0}
+.kv span:first-child{color:var(--mut)}
+.kv b{font-weight:600}
+.pos{color:var(--ok)} .neg{color:var(--lula)}
+/* gráfico */
+svg text{font-family:Barlow,system-ui,sans-serif}
+.leg{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mut);margin-top:6px}
+.leg i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:5px}
+/* listas */
+.lin{display:grid;grid-template-columns:34px minmax(0,1fr) 62px;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.lin:last-child{border-bottom:0}
+.lin .uf{font-weight:700;font-family:"Barlow Condensed",-apple-system,system-ui,sans-serif;font-size:17px}
+.mini{height:8px;border-radius:5px;background:var(--line);position:relative;overflow:hidden}
+.mini .l{position:absolute;left:0;top:0;bottom:0;background:var(--lula)}
+.mini .f{position:absolute;right:0;top:0;bottom:0;background:var(--flavio)}
+.mini .m{position:absolute;left:50%;top:-2px;bottom:-2px;width:1.5px;background:var(--txt);opacity:.6}
+.lin .sub span:first-child{overflow:hidden;text-overflow:ellipsis}
+.lin .sub{font-size:11px;white-space:nowrap;gap:6px;min-width:0;color:var(--mut2);margin-top:3px;display:flex;justify-content:space-between}
+.lin .v{text-align:right;font-weight:600}
+.tabs{display:flex;gap:6px;margin-bottom:8px}
+.tab{flex:1;text-align:center;padding:7px 0;border-radius:10px;background:var(--card2);font-size:13px;font-weight:600;color:var(--mut);border:1px solid var(--line)}
+.tab.on{color:var(--txt);border-color:var(--mut2)}
+.rodape{text-align:center;font-size:12px;color:var(--mut2);margin-top:14px;line-height:1.5}
+.btn{background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:6px 10px;font-size:13px;font-weight:600}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div><div class="marca">PAINEL DO DJ</div><h1 class="cond">2º turno · Presidente</h1></div>
+    <div class="live"><span class="dot" id="dot"></span><span id="hora">conectando…</span></div>
+  </div>
+  <div id="avisos"></div>
+
+  <div class="card">
+    <div class="placar">
+      <div class="cand"><div class="nm lula">LULA</div><div class="pc lula" id="pl">—</div><div class="vt" id="vl">—</div></div>
+      <div class="cand r"><div class="nm flavio">FLÁVIO</div><div class="pc flavio" id="pf">—</div><div class="vt" id="vf">—</div></div>
+    </div>
+    <div class="split"><i id="sl" style="background:var(--lula);width:50%"></i><i id="sf" style="background:var(--flavio);width:50%"></i><span class="meio"></span></div>
+    <div class="apur"><span>Urnas apuradas</span><b id="ap" style="color:var(--txt)">—</b></div>
+    <div class="apurbar"><i id="apb" style="width:0"></i></div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Projeção do resultado final</div>
+    <div class="veredito" id="ver">Aguardando os primeiros dados…</div>
+    <div class="gauge-wrap">
+      <svg viewBox="0 0 300 162" id="gsvg"></svg>
+      <div class="gauge-txt"><div class="n" id="gn">—</div><div class="s" id="gs">chance de vitória</div></div>
+    </div>
+    <div class="chs"><span class="lula" id="cl">Lula —</span><span class="flavio" id="cf">Flávio —</span></div>
+    <div class="faixa">
+      <div class="lbl" style="margin-bottom:4px">Flávio no final — faixa provável (90%)</div>
+      <div class="reg"><div class="eixo"></div><div class="band" id="fb"></div><div class="cinq"></div><div class="pt" id="fp"></div></div>
+      <div class="ticks"><span>45%</span><span>47,5%</span><span>50%</span><span>52,5%</span><span>55%</span></div>
+    </div>
+    <div style="margin-top:10px">
+      <div class="kv"><span>Projeção Flávio</span><b class="flavio" id="kf">—</b></div>
+      <div class="kv"><span>Projeção Lula</span><b class="lula" id="kl">—</b></div>
+      <div class="kv"><span>Flávio vs 1º turno (mesmos locais)</span><b id="k1">—</b></div>
+      <div class="kv"><span>Flávio vs Bolsonaro 2022 (mesmos locais)</span><b id="k22">—</b></div>
+      <div class="kv"><span>Municípios já no modelo</span><b id="kn">—</b></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Ao longo da noite (Flávio, % dos válidos)</div>
+    <svg viewBox="0 0 340 190" id="chart" style="width:100%;margin-top:8px"></svg>
+    <div class="leg"><span><i style="background:var(--flavio)"></i>Projeção final</span><span><i style="background:rgba(59,134,246,.35);height:8px"></i>Faixa 90%</span><span><i style="background:var(--warn)"></i>Nas urnas</span></div>
+  </div>
+
+  <div class="card">
+    <div class="tabs"><div class="tab on" data-t="reg">Regiões</div><div class="tab" data-t="uf">Estados</div></div>
+    <div id="lista"></div>
+  </div>
+
+  <div class="rodape">
+    Atualiza sozinho a cada 15 s · <span id="ult">—</span><br>
+    Votos: TSE (resultado oficial em resultados.tse.jus.br)<br>
+    Projeção e chances: estimativa estatística não oficial do Painel do DJ<br><br>
+    <button class="btn" id="tema">Tema claro</button>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const pct=(x,d=1)=>x==null||isNaN(x)?"—":(x*100).toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d})+"%";
+const pp=x=>x==null?"—":((x>=0?"+":"")+(x*100).toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1})+" p.p.");
+const num=x=>x==null?"—":Math.round(x).toLocaleString("pt-BR");
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const NOME_REG={"r:N":"Norte","r:NE":"Nordeste","r:CO":"Centro-Oeste","r:SE":"Sudeste","r:S":"Sul","r:EX":"Exterior"};
+let D=null, aba="reg", ultimoOk=0, tema=(()=>{try{return localStorage.getItem("tema")||"dark"}catch(e){return "dark"}})();
+
+function aplicarTema(){document.documentElement.setAttribute("data-theme",tema);$("tema").textContent=tema==="dark"?"Tema claro":"Tema escuro";
+  document.querySelector('meta[name=theme-color]').content=tema==="dark"?"#0b1220":"#eef2f8"; if(D) render(D);}
+$("tema").onclick=()=>{tema=tema==="dark"?"light":"dark";try{localStorage.setItem("tema",tema)}catch(e){};aplicarTema();};
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{aba=t.dataset.t;document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x===t));if(D)lista(D);});
+
+function arco(cx,cy,r,a0,a1){const p=a=>[cx+r*Math.cos(a),cy+r*Math.sin(a)];const [x0,y0]=p(a0),[x1,y1]=p(a1);return `M${x0},${y0} A${r},${r} 0 ${a1-a0>Math.PI?1:0} 1 ${x1},${y1}`;}
+function gauge(pF){
+  const cx=150,cy=150,r=118,w=22; const lin=css("--line");
+  let s=`<path d="${arco(cx,cy,r,Math.PI,2*Math.PI)}" stroke="${lin}" stroke-width="${w}" fill="none" stroke-linecap="round"/>`;
+  if(pF!=null){ const corte=Math.PI+Math.PI*(1-pF);
+    if(pF<0.999) s+=`<path d="${arco(cx,cy,r,Math.PI,corte)}" stroke="${css("--lula")}" stroke-width="${w}" fill="none" stroke-linecap="round"/>`;
+    if(pF>0.001) s+=`<path d="${arco(cx,cy,r,corte,2*Math.PI)}" stroke="${css("--flavio")}" stroke-width="${w}" fill="none" stroke-linecap="round"/>`;
+    const a=Math.PI+Math.PI*pF; s+=`<line x1="${cx}" y1="${cy}" x2="${cx+(r-38)*Math.cos(a)}" y2="${cy+(r-38)*Math.sin(a)}" stroke="${css("--txt")}" stroke-width="4" stroke-linecap="round" opacity=".9"/><circle cx="${cx}" cy="${cy}" r="7" fill="${css("--txt")}"/>`; }
+  s+=`<line x1="${cx}" y1="${cy-r-w/2-4}" x2="${cx}" y2="${cy-r+w/2+4}" stroke="${css("--txt")}" stroke-width="2" opacity=".6"/>`;
+  $("gsvg").innerHTML=s;
+}
+function grafico(h){
+  const W=340,H=190,L=34,R=18,T=8,B=24; const pts=h.filter(p=>p[0]!=null);
+  const xs=x=>L+(W-L-R)*x, ys=y=>T+(H-T-B)*(1-(y-0.40)/0.25);  // eixo 40% a 65%
+  const lin=css("--line"), mut=css("--mut2"); let s="";
+  for(const y of [0.40,0.45,0.50,0.55,0.60,0.65]){s+=`<line x1="${L}" x2="${W-R}" y1="${ys(y)}" y2="${ys(y)}" stroke="${lin}" stroke-width="${y===0.5?1.6:0.8}" ${y===0.5?'':'stroke-dasharray="3 4"'}/><text x="${L-5}" y="${ys(y)+4}" font-size="10" fill="${mut}" text-anchor="end">${Math.round(y*100)}%</text>`;}
+  for(const x of [0,0.25,0.5,0.75,1]) s+=`<text x="${xs(x)}" y="${H-6}" font-size="10" fill="${mut}" text-anchor="middle">${x*100}%</text>`;
+  const cl=v=>Math.max(0.40,Math.min(0.65,v));
+  const pr=pts.filter(p=>p[2]!=null);
+  if(pr.length>1){
+    const top=pr.map(p=>`${xs(p[0])},${ys(cl(p[2]+1.645*p[3]))}`), bot=pr.slice().reverse().map(p=>`${xs(p[0])},${ys(cl(p[2]-1.645*p[3]))}`);
+    s+=`<polygon points="${top.concat(bot).join(" ")}" fill="rgba(59,134,246,.28)"/>`;
+    s+=`<polyline points="${pr.map(p=>`${xs(p[0])},${ys(cl(p[2]))}`).join(" ")}" fill="none" stroke="${css("--flavio")}" stroke-width="3" stroke-linejoin="round"/>`;
+  }
+  const at=pts.filter(p=>p[1]!=null);
+  if(at.length>1) s+=`<polyline points="${at.map(p=>`${xs(p[0])},${ys(cl(p[1]))}`).join(" ")}" fill="none" stroke="${css("--warn")}" stroke-width="2" stroke-linejoin="round"/>`;
+  if(pr.length){const u=pr[pr.length-1]; s+=`<circle cx="${xs(u[0])}" cy="${ys(cl(u[2]))}" r="4.5" fill="${css("--flavio")}"/>`;}
+  if(!pts.length) s+=`<text x="${W/2}" y="${H/2}" font-size="13" fill="${mut}" text-anchor="middle">o gráfico aparece com os primeiros dados</text>`;
+  $("chart").innerHTML=s;
+}
+function linha(sig,nome,f,proj,p,pst,extra){
+  const lw=f==null?50:(1-f)*100, fw=f==null?50:f*100;
+  const lider=proj==null?"":(proj>=0.5?`<span class="flavio">${pct(proj)}</span>`:`<span class="lula">${pct(1-proj)}</span>`);
+  return `<div class="lin"><div class="uf">${sig}</div><div><div class="mini"><span class="l" style="width:${lw}%"></span><span class="f" style="width:${fw}%"></span><span class="m"></span></div>
+    <div class="sub"><span>${nome} · ${pct(pst,0)}</span><span>${extra||""}</span></div></div><div class="v">${lider||"—"}</div></div>`;
+}
+function lista(d){
+  let h="";
+  if(aba==="reg"){
+    for(const k of ["r:SE","r:NE","r:S","r:N","r:CO","r:EX"]){const r=d.regs[k]; if(!r) continue;
+      const ufsR=d.ufs.filter(u=>REG(u.uf)===k.slice(2)); const te=ufsR.reduce((s,u)=>s+(u.te||0),0); const pst=te?ufsR.reduce((s,u)=>s+(u.pst||0)*(u.te||0),0)/te:0;
+      h+=linha(k.slice(2),NOME_REG[k],r.atual,r.proj,r.p,pst,r.f1!=null?`1º t. ${pct(r.f1)}`:"");}
+    h=h||`<div class="lin" style="grid-template-columns:1fr">Aguardando dados…</div>`;
+    h+=`<div style="font-size:11px;color:var(--mut2);margin-top:8px">Barra: Lula x Flávio nas urnas agora · % apurado · Flávio no 1º turno. À direita: quem lidera na projeção final.</div>`;
+  } else {
+    const us=d.ufs.slice().sort((a,b)=>(b.te||0)-(a.te||0));
+    for(const u of us) h+=linha(u.uf.toUpperCase(),u.nome,u.f,u.proj,u.p,u.pst,u.d1t!=null?`vs 1º t.: ${pp(u.d1t)}`:"");
+  }
+  $("lista").innerHTML=h;
+}
+function REG(u){const R={ac:"N",am:"N",ap:"N",pa:"N",ro:"N",rr:"N",to:"N",al:"NE",ba:"NE",ce:"NE",ma:"NE",pb:"NE",pe:"NE",pi:"NE",rn:"NE",se:"NE",df:"CO",go:"CO",ms:"CO",mt:"CO",es:"SE",mg:"SE",rj:"SE",sp:"SE",pr:"S",rs:"S",sc:"S"};return R[u]||"EX";}
+
+function render(d){
+  D=d;
+  $("avisos").innerHTML=(d.erros||[]).filter(e=>!/atrasado/.test(e)).map(e=>`<div class="aviso">${e}</div>`).join("");
+  const b=d.br, vv=b&&b.vv; const fL=vv?b.lula/vv:null, fF=vv?b.flavio/vv:null;
+  $("pl").textContent=pct(fL); $("pf").textContent=pct(fF); $("vl").textContent=vv?num(b.lula)+" votos":"—"; $("vf").textContent=vv?num(b.flavio)+" votos":"—";
+  $("sl").style.width=(fL==null?50:fL*100)+"%"; $("sf").style.width=(fF==null?50:fF*100)+"%";
+  $("ap").textContent=b?pct(b.pst,2):"—"; $("apb").style.width=(b?b.pst*100:0)+"%";
+  $("hora").textContent=d.hg&&d.hg[1]?`TSE ${d.hg[1].slice(0,5)}`:(d.modo==="demo"?"demonstração":"aguardando TSE");
+  const p=d.proj;
+  if(p){
+    const lid=p.proj>=0.5?"Flávio":"Lula", ch=p.proj>=0.5?p.p:1-p.p, v=p.proj>=0.5?p.proj:1-p.proj;
+    let frase=ch>=0.99?`${lid} deve vencer`:ch>=0.9?`${lid} é o grande favorito`:ch>=0.7?`${lid} está à frente`:"Disputa em aberto";
+    $("ver").innerHTML=`${frase}: projeção de <span class="${lid==="Lula"?"lula":"flavio"}">${pct(v)}</span> para ${lid}`;
+    gauge(p.p); $("gn").textContent=pct(ch,ch>0.995||ch<0.005?1:0); $("gn").className="n "+(lid==="Lula"?"lula":"flavio"); $("gs").textContent=`chance de ${lid} vencer`;
+    $("cl").textContent=`Lula ${pct(1-p.p,0)}`; $("cf").textContent=`Flávio ${pct(p.p,0)}`;
+    const X=x=>Math.max(0,Math.min(100,(x-0.45)/0.10*100));
+    $("fb").style.left=X(p.lo)+"%"; $("fb").style.width=Math.max(1.5,X(p.hi)-X(p.lo))+"%"; $("fp").style.left=X(p.proj)+"%";
+    $("kf").textContent=`${pct(p.proj)} (${pct(p.lo)} a ${pct(p.hi)})`; $("kl").textContent=`${pct(1-p.proj)} (${pct(1-p.hi)} a ${pct(1-p.lo)})`;
+    const e=(id,x)=>{$(id).textContent=pp(x);$(id).className=x>0?"pos":x<0?"neg":"";}; e("k1",p.d1t); e("k22",p.d22);
+    $("kn").textContent=d.modelo?`${num(d.modelo.n_obs)} de ${num(d.modelo.n_total)}`:"—";
+  } else { gauge(null); }
+  grafico(d.hist||[]); lista(d);
+}
+const SUPA="https://ihwdycrujrvpwvjfcioy.supabase.co", KEY="sb_publishable_-fE5D8rarCcGXt1FHHf5TA_SRIOZ483";
+const PID=(location.hash||"").replace("#","")==="demo"?"demo":"2t";
+let atualizado=0;
+async function tick(){
+  try{
+    const r=await fetch(`${SUPA}/rest/v1/painel?id=eq.${PID}&select=dados,atualizado`,{headers:{apikey:KEY},cache:"no-store"});
+    if(!r.ok) throw 0; const rows=await r.json(); ultimoOk=Date.now();
+    if(!rows.length){ $("ver").textContent=PID==="2t"?"A apuração começa às 17h (Brasília). O painel liga um pouco antes.":"Demonstração ainda não iniciada."; $("ult").textContent="aguardando o painel"; return; }
+    atualizado=Date.parse(rows[0].atualizado)||Date.now();
+    render(rows[0].dados);
+    if(!rows[0].dados.br&&PID==="2t") $("ver").textContent="Painel ligado. A apuração do TSE começa às 17h (Brasília).";
+  } catch(e){ $("dot").className="dot off"; }
+}
+setInterval(()=>{
+  if(!ultimoOk){$("ult").textContent="conectando…";return;}
+  if(!atualizado) return;
+  const s=Math.max(0,Math.round((Date.now()-atualizado)/1000)); const fresco=s<150;
+  $("ult").textContent=fresco?`atualizado há ${s} s`:`sem novidades do painel há ${Math.round(s/60)} min`;
+  $("dot").className=fresco&&Date.now()-ultimoOk<45000?"dot":"dot off";
+},1000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)tick();});
+window.addEventListener("hashchange",()=>location.reload());
+aplicarTema(); tick(); setInterval(tick,15000);
+</script>
+</body>
+</html>
