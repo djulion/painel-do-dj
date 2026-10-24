@@ -187,6 +187,21 @@ body.com-tk .app{padding-bottom:calc(env(safe-area-inset-bottom) + 74px)}
 @keyframes boomFundo{from{opacity:0}to{opacity:1}}
 @keyframes girar{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.boom,.boom-c,.boom .raios{animation:none}}
+
+/* municípios do estado */
+.munbox{margin-top:10px}
+.munbox[hidden]{display:none!important}
+.munbox input{width:100%;font:inherit;font-size:16px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:var(--txt)}
+.munbox input:focus{outline:2px solid var(--flavio);outline-offset:1px}
+.mrow{padding:10px 2px;border-bottom:1px solid var(--line)}
+.mrow:last-child{border-bottom:0}
+.mrow.fixa{background:linear-gradient(90deg,rgba(239,75,75,.10),rgba(59,134,246,.10));border-radius:12px;padding:10px;border:1px solid var(--line);margin:8px 0}
+.mtop{display:flex;align-items:baseline;gap:8px;margin-bottom:5px}
+.mtop b{font-size:15px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mtop .mv{margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pin{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:999px;background:var(--warn);color:#1a1300;white-space:nowrap}
+.mrow .sub{font-size:11.5px;color:var(--mut2);margin-top:4px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.mun-v{font-size:13px;color:var(--mut);padding:10px 2px}
 </style>
 </head>
 <body>
@@ -244,7 +259,11 @@ body.com-tk .app{padding-bottom:calc(env(safe-area-inset-bottom) + 74px)}
     <div class="mapa" id="mapa"></div>
     <div class="map-leg"><span>Cor: quem lidera na projeção do estado (mais forte = vantagem maior) · barra amarela: % apurado</span>
       <span class="escala"><i style="background:var(--lula)"></i><i style="background:rgba(239,75,75,.45)"></i><i style="background:var(--card2)"></i><i style="background:rgba(59,134,246,.45)"></i><i style="background:var(--flavio)"></i></span></div>
-    <div class="map-det" id="mapdet">Toque num estado para ver os números dele.</div>
+    <div class="map-det" id="mapdet">Toque num estado para ver os números dele e buscar o seu município.</div>
+    <div class="munbox" id="munbox" hidden>
+      <input id="mun-q" type="search" placeholder="Buscar município" autocomplete="off" aria-label="Buscar município">
+      <div id="mun-lista"></div>
+    </div>
   </div>
 
   <div class="card vir" id="c-vir">
@@ -364,13 +383,48 @@ function REG(u){const R={ac:"N",am:"N",ap:"N",pa:"N",ro:"N",rr:"N",to:"N",al:"NE
 // ===== mapa do Brasil em quadrados (linha, coluna)
 const POS={rr:[0,2],ap:[0,4],am:[1,1],pa:[1,3],ma:[1,4],ce:[1,5],rn:[1,6],ac:[2,0],ro:[2,1],mt:[2,2],to:[2,3],pi:[2,4],pe:[2,5],pb:[2,6],
   go:[3,2],df:[3,3],ba:[3,4],se:[3,5],al:[3,6],ms:[4,2],mg:[4,3],es:[4,4],pr:[5,1],sp:[5,2],rj:[5,3],sc:[6,1],zz:[6,5],rs:[7,1]};
-let UFSEL=null;
+const QS=new URLSearchParams(location.search);
+let UFSEL=(QS.get("uf")||"").toLowerCase()||null; if(UFSEL&&!POS[UFSEL])UFSEL=null;
+const CIDADE=(QS.get("cidade")||"").trim(), UF_CIDADE=UFSEL;
+const norm=t=>String(t||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+let MUN={uf:null,dados:null,t:0};
+async function carregarMun(forcar){
+  if(!UFSEL) return; if(!forcar&&MUN.uf===UFSEL&&Date.now()-MUN.t<30000) return;
+  const uf=UFSEL; if(MUN.uf!==uf){MUN={uf,dados:null,t:0};listaMun();}
+  MUN.t=Date.now();
+  try{const r=await fetch(`${SUPA}/rest/v1/painel?id=eq.${PID}:${uf}&select=dados`,{headers:{apikey:KEY},cache:"no-store"});
+    if(!r.ok)return; const rows=await r.json(); if(UFSEL!==uf)return; MUN={uf,dados:rows[0]?rows[0].dados:null,t:Date.now()}; listaMun();}catch(e){}
+}
+function linhaMun(x,fixa){
+  const [nm,pst,vv,fB,b1,b22]=x;
+  const lw=fB==null?50:(1-fB)*100, fw=fB==null?50:fB*100;
+  const lead=fB==null?`<span style="color:var(--mut2);font-weight:500">aguardando</span>`:(fB>=0.5?`<span class="flavio">Flávio ${pct(fB)}</span>`:`<span class="lula">Lula ${pct(1-fB)}</span>`);
+  const dif=(fB!=null&&b1!=null)?` · <b class="${fB-b1>=0?"pos":"neg"}">${pp(fB-b1)}</b>`:"";
+  return `<div class="mrow${fixa?" fixa":""}"><div class="mtop"><b>${tkEsc(nm)}</b>${fixa?'<span class="pin">sua cidade</span>':""}<span class="mv">${lead}</span></div>
+    <div class="mini"><span class="l" style="width:${lw}%"></span><span class="f" style="width:${fw}%"></span><span class="m"></span></div>
+    <div class="sub"><span>${pct(pst||0,0)} apurado${vv?` · ${num(vv)} votos`:""}</span><span>Flávio no 1º turno: ${pct(b1)}${dif}</span></div></div>`;
+}
+function listaMun(){
+  const box=$("munbox"); if(!UFSEL){box.hidden=true;return;} box.hidden=false;
+  $("mun-q").placeholder=UFSEL==="zz"?"Buscar cidade no exterior":`Buscar município em ${UFSEL.toUpperCase()}`;
+  const m=MUN.uf===UFSEL&&MUN.dados?MUN.dados.m:null;
+  if(!m){$("mun-lista").innerHTML=`<div class="mun-v">${MUN.uf===UFSEL&&MUN.t?"Os municípios aparecem quando o painel começar a publicar.":"Carregando municípios…"}</div>`;return;}
+  const q=norm($("mun-q").value.trim());
+  let fixa=null; if(CIDADE&&UFSEL===UF_CIDADE) fixa=m.find(x=>norm(x[0])===norm(CIDADE))||null;
+  let lst=q?m.filter(x=>norm(x[0]).includes(q)).slice(0,40):m.slice(0,15);
+  if(fixa&&!q) lst=lst.filter(x=>x!==fixa);
+  let h=(fixa&&!q?linhaMun(fixa,true):"")+lst.map(x=>linhaMun(x,false)).join("");
+  if(!lst.length&&q) h=`<div class="mun-v">Nenhum município encontrado com "${tkEsc($("mun-q").value)}".</div>`;
+  h+=`<div class="mun-v">${q?`${lst.length} resultado(s)`:`Mostrando os 15 maiores de ${num(m.length)} municípios. Digite para buscar.`} Atualiza a cada 30 s.</div>`;
+  $("mun-lista").innerHTML=h;
+}
+$("mun-q").addEventListener("input",listaMun);
 function rgba(hex,a){const h=hex.replace("#","");const n=parseInt(h.length===3?h.split("").map(c=>c+c).join(""):h,16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`;}
 function mapa(d){
   const box=$("mapa"); const por={}; (d.ufs||[]).forEach(u=>por[u.uf]=u);
   if(!box.children.length){
     box.innerHTML=Object.entries(POS).map(([u,[r,c]])=>`<button class="tile" id="t-${u}" style="grid-row:${r+1};grid-column:${c+1}" aria-label="${u.toUpperCase()}"><b>${u==="zz"?"EX":u.toUpperCase()}</b><small></small><i class="ap"></i></button>`).join("");
-    box.querySelectorAll(".tile").forEach(t=>t.onclick=()=>{UFSEL=t.id.slice(2);if(D)mapa(D);});
+    box.querySelectorAll(".tile").forEach(t=>t.onclick=()=>{const u=t.id.slice(2);if(u!==UFSEL)$("mun-q").value="";UFSEL=u;if(D)mapa(D);carregarMun(true);});
   }
   const cL=css("--lula"), cF=css("--flavio");
   for(const u in POS){
@@ -554,7 +608,7 @@ function render(d){
     const e=(id,x)=>{$(id).textContent=pp(x);$(id).className=x>0?"pos":x<0?"neg":"";}; e("k1",p.d1t); e("k22",p.d22);
     $("kn").textContent=d.modelo?`${num(d.modelo.n_obs)} de ${num(d.modelo.n_total)}`:"—";
   } else { gauge(null); }
-  grafico(d.hist||[]); lista(d); mapa(d); virada(d); selo(d); ticker(d);
+  grafico(d.hist||[]); lista(d); mapa(d); virada(d); selo(d); ticker(d); carregarMun(false);
   if(b&&ultPst!=null&&b.pst!==ultPst){const c=$("c-placar");c.classList.remove("pisca");void c.offsetWidth;c.classList.add("pisca");}
   ultPst=b?b.pst:null;
 }
@@ -586,9 +640,9 @@ setInterval(()=>{
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)tick();});
 window.addEventListener("hashchange",()=>location.reload());
 $("cheia").onclick=()=>{const e=document.documentElement; if(!document.fullscreenElement){(e.requestFullscreen||e.webkitRequestFullscreen||(()=>{})).call(e);}else{document.exitFullscreen&&document.exitFullscreen();}};
-const VERSAO="7";
+const VERSAO="8";
 async function checarVersao(){try{const r=await fetch("versao.txt?"+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
-  if(v&&v!==VERSAO)location.replace(location.pathname+"?v="+v+location.hash);}catch(e){}}
+  if(v&&v!==VERSAO){const q=new URLSearchParams(location.search);q.set("v",v);location.replace(location.pathname+"?"+q.toString()+location.hash);}}catch(e){}}
 setInterval(checarVersao,120000); setTimeout(checarVersao,4000);
 aplicarTema(); tick(); setInterval(tick,15000);
 </script>
