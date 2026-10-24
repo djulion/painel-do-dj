@@ -157,6 +157,33 @@ body.com-tk .app{padding-bottom:calc(env(safe-area-inset-bottom) + 74px)}
 @media (min-width:1100px){.tk .trilho{font-size:20px;padding:14px 0}.tk .rot{font-size:18px;padding:0 18px}}
 @media (max-width:1099px){.cand .pc{font-size:clamp(36px,11vw,54px)}}
 @media (min-width:1100px){.cand .pc{font-size:min(4.6vw,92px)}}
+
+/* explosão: o painel cravou */
+.boom{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;overflow:hidden;
+  padding:calc(env(safe-area-inset-top,0px) + 20px) max(20px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 20px) max(20px,env(safe-area-inset-left,0px));
+  background:radial-gradient(circle at 50% 45%,var(--boom-cor) 0%,rgba(8,12,22,.96) 62%);animation:boomFundo .5s ease-out}
+.boom[hidden]{display:none!important}
+.boom canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.boom .raios{position:absolute;left:50%;top:45%;width:240vmax;height:240vmax;margin:-120vmax 0 0 -120vmax;opacity:.16;
+  background:repeating-conic-gradient(from 0deg,#fff 0deg 6deg,transparent 6deg 18deg);animation:girar 40s linear infinite;pointer-events:none}
+.boom-c{position:relative;text-align:center;color:#fff;max-width:900px;animation:boomEntra .9s cubic-bezier(.2,1.6,.4,1) both}
+.boom .ey{font-family:"Barlow Condensed",-apple-system,system-ui,sans-serif;font-weight:700;letter-spacing:.22em;font-size:clamp(14px,3.6vw,26px);opacity:.92}
+.boom .nome{font-family:"Barlow Condensed",-apple-system,system-ui,sans-serif;font-weight:700;font-size:clamp(46px,13vw,140px);line-height:.95;margin:10px 0 0;text-shadow:0 6px 40px rgba(0,0,0,.35);text-wrap:balance}
+.boom .vence{font-family:"Barlow Condensed",-apple-system,system-ui,sans-serif;font-weight:700;font-size:clamp(30px,8vw,84px);line-height:1;letter-spacing:.06em}
+.boom .num{display:flex;justify-content:center;gap:clamp(14px,4vw,48px);flex-wrap:wrap;margin:20px 0 6px}
+.boom .num div{min-width:0}
+.boom .num b{display:block;font-family:"Barlow Condensed",-apple-system,system-ui,sans-serif;font-size:clamp(30px,8vw,64px);line-height:1;font-variant-numeric:tabular-nums}
+.boom .num span{font-size:clamp(11px,2.8vw,15px);opacity:.85;letter-spacing:.06em;text-transform:uppercase}
+.boom .linha{font-size:clamp(14px,3.8vw,22px);margin-top:12px;opacity:.95;line-height:1.4}
+.boom .linha b{font-weight:700}
+.boom .gan{display:inline-block;margin-top:14px;padding:8px 18px;border-radius:999px;background:#fff;color:#0b1220;font-weight:700;font-size:clamp(15px,4vw,24px)}
+.boom button{margin-top:22px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.5);color:#fff;border-radius:999px;padding:11px 22px;font:600 15px Barlow,-apple-system,system-ui,sans-serif;cursor:pointer}
+.boom button:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.boom .assin{margin-top:16px;font-size:12px;letter-spacing:.18em;opacity:.75}
+@keyframes boomEntra{0%{transform:scale(.25);opacity:0}60%{opacity:1}100%{transform:scale(1);opacity:1}}
+@keyframes boomFundo{from{opacity:0}to{opacity:1}}
+@keyframes girar{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.boom,.boom-c,.boom .raios{animation:none}}
 </style>
 </head>
 <body>
@@ -245,6 +272,20 @@ body.com-tk .app{padding-bottom:calc(env(safe-area-inset-bottom) + 74px)}
     Projeção e chances: estimativa estatística não oficial do Painel do DJ<br><br>
     <button class="btn" id="tema">Tema claro</button> <button class="btn so-estudio" id="cheia">Tela cheia</button>
     <div class="dakia">Desenvolvido por <b>DAKIA</b><br>Djulion Andgili Kolberg Inteligência Aplicada</div>
+  </div>
+</div>
+
+<div class="boom" id="boom" hidden role="dialog" aria-modal="true" aria-labelledby="boom-nome">
+  <div class="raios"></div><canvas id="confete"></canvas>
+  <div class="boom-c">
+    <div class="ey" id="boom-ey">O PAINEL DO DJ CRAVOU</div>
+    <div class="nome" id="boom-nome">—</div>
+    <div class="vence" id="boom-vence">VENCE</div>
+    <div class="num" id="boom-num"></div>
+    <div class="linha" id="boom-linha"></div>
+    <div id="boom-gan"></div>
+    <button id="boom-ok">Continuar acompanhando</button>
+    <div class="assin">PAINEL DO DJ · DAKIA</div>
   </div>
 </div>
 
@@ -394,6 +435,9 @@ function selo(d){
   if(im>=0){hm=h[im][5];pm=h[im][0];}
   else if(b&&b.vv){const R=Math.max(0,total-b.vv); if(Math.abs(b.flavio-b.lula)>=R&&((b.flavio>=b.lula)===(lado==="F"))){hm=d.hg&&d.hg[1];pm=b.pst;}}
   el.className="selo"; $("selo-ey").textContent="O PAINEL DO DJ CRAVOU";
+  const pb=d.proj||{}; const projL=lado==="F"?pb.proj:(pb.proj==null?null:1-pb.proj);
+  const base={lado,nome,hc,pc,proj:projL,chance:lado==="F"?pb.p:(pb.p==null?null:1-pb.p),
+    lo:lado==="F"?pb.lo:(pb.hi==null?null:1-pb.hi),hi:lado==="F"?pb.hi:(pb.lo==null?null:1-pb.lo),pst:d.br?d.br.pst:pc};
   $("selo-t").innerHTML=`Projeção: <span class="${cls}">${nome}</span> vence`;
   let s=`Cravado às <b>${hhmm(hc)}</b>, com <b>${pct(pc,1)}</b> das urnas apuradas.`;
   if(hm){const dm=minutos(hm)-minutos(hc);
@@ -401,6 +445,10 @@ function selo(d){
     if(dm>0) s+=`<br><span class="gan">O Painel do DJ cravou ${dm>=60?`${Math.floor(dm/60)}h${String(dm%60).padStart(2,"0")}`:`${dm} min`} antes</span>`;
   } else s+=`<br>Aguardando a garantia matemática (quando não der mais para virar).`;
   $("selo-s").innerHTML=s;
+  const k1=`cravou-${PID}-${lado}-${hc}`, k2=`garantia-${PID}-${lado}-${hc}`;
+  if(hm&&!jaVi(k2)){const dm=minutos(hm)-minutos(hc);marcar(k1);marcar(k2);
+    explodir({...base,garantia:true,hm,antes:dm>0?(dm>=60?`${Math.floor(dm/60)}h${String(dm%60).padStart(2,"0")}`:`${dm} min`):null});}
+  else if(!hm&&!jaVi(k1)){marcar(k1);explodir({...base,garantia:false});}
 }
 
 // ===== barra de notícias: letreiro contínuo (não reinicia quando chega notícia nova)
@@ -431,6 +479,50 @@ function ticker(d){
   const novas=TK.assin?ns.filter(n=>!TK.assin.includes(n.h+n.txt)).length:0;
   TK.assin=assin; TK.fila=ns; if(novas) TK.idx=0;   // a mais nova entra logo depois do que está passando
   if(!TK.rodando){TK.rodando=true;requestAnimationFrame(tkPasso);}
+}
+
+// ===== explosão na tela quando o painel crava (e de novo na garantia matemática)
+const VISTOS=(()=>{try{return (location.hash||"").replace("#","")==="demo"?sessionStorage:localStorage}catch(e){return null}})();
+const jaVi=k=>{try{return VISTOS&&VISTOS.getItem(k)==="1"}catch(e){return false}};
+const marcar=k=>{try{VISTOS&&VISTOS.setItem(k,"1")}catch(e){}};
+let boomTimer=null;
+function explodir(info){
+  const cor=info.lado==="F"?css("--flavio"):css("--lula");
+  const el=$("boom"); el.style.setProperty("--boom-cor",cor);
+  $("boom-ey").textContent=info.garantia?"VITÓRIA MATEMATICAMENTE GARANTIDA":"O PAINEL DO DJ CRAVOU";
+  $("boom-nome").textContent=info.nome.toUpperCase();
+  $("boom-vence").textContent="VENCE";
+  $("boom-num").innerHTML=`<div><b>${pct(info.proj)}</b><span>projeção</span></div><div><b>${pct(info.chance,info.chance>0.995?1:0)}</b><span>chance</span></div><div><b>${pct(info.pst,1)}</b><span>urnas apuradas</span></div>`;
+  $("boom-linha").innerHTML=info.garantia
+    ?`Garantia matemática às <b>${hhmm(info.hm)}</b>. O painel tinha cravado às <b>${hhmm(info.hc)}</b>, com ${pct(info.pc,1)} das urnas.`
+    :`Cravado às <b>${hhmm(info.hc)}</b> (horário do TSE) · faixa provável de ${pct(info.lo)} a ${pct(info.hi)}`;
+  $("boom-gan").innerHTML=(info.garantia&&info.antes?`<span class="gan">O Painel do DJ cravou ${info.antes} antes</span>`:"")
+    +(info.garantia?`<div class="linha" style="font-size:13px;opacity:.75">Pela conta do painel, a vantagem já supera todos os votos que faltam. Resultado oficial: TSE.</div>`
+                   :`<div class="linha" style="font-size:13px;opacity:.75">Projeção estatística do Painel do DJ. Resultado oficial: TSE.</div>`);
+  el.hidden=false; $("boom-ok").focus({preventScroll:true});
+  try{navigator.vibrate&&navigator.vibrate([120,60,120,60,240]);}catch(e){}
+  confete(cor);
+  clearTimeout(boomTimer); boomTimer=setTimeout(fecharBoom,30000);
+}
+function fecharBoom(){$("boom").hidden=true;clearTimeout(boomTimer);}
+$("boom-ok").onclick=fecharBoom;
+document.addEventListener("keydown",e=>{if(e.key==="Escape")fecharBoom();});
+function confete(cor){
+  const cv=$("confete"), ctx=cv.getContext("2d"), dpr=Math.min(2,devicePixelRatio||1);
+  const W=cv.clientWidth, H=cv.clientHeight; cv.width=W*dpr; cv.height=H*dpr; ctx.scale(dpr,dpr);
+  const lento=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const cores=[cor,"#ffffff",css("--warn"),cor];
+  const ps=Array.from({length:lento?60:220},(_,i)=>{const a=-Math.PI/2+(Math.random()-0.5)*Math.PI*1.3, v=6+Math.random()*12;
+    return {x:W/2,y:H*0.45,vx:Math.cos(a)*v,vy:Math.sin(a)*v,r:3+Math.random()*5,rot:Math.random()*6,vr:(Math.random()-0.5)*0.4,c:cores[i%4],f:Math.random()<0.5};});
+  const t0=performance.now();
+  (function quadro(t){
+    const dt=Math.min(2,(t-(quadro.u||t))/16.7); quadro.u=t;
+    ctx.clearRect(0,0,W,H);
+    for(const p of ps){p.vy+=0.28*dt;p.vx*=0.99;p.x+=p.vx*dt;p.y+=p.vy*dt;p.rot+=p.vr*dt;
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.fillStyle=p.c;
+      if(p.f)ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r);else{ctx.beginPath();ctx.arc(0,0,p.r/1.4,0,7);ctx.fill();}ctx.restore();}
+    if(t-t0<5000&&!$("boom").hidden)requestAnimationFrame(quadro);else ctx.clearRect(0,0,W,H);
+  })(t0);
 }
 
 let ultPst=null;
@@ -487,6 +579,10 @@ setInterval(()=>{
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)tick();});
 window.addEventListener("hashchange",()=>location.reload());
 $("cheia").onclick=()=>{const e=document.documentElement; if(!document.fullscreenElement){(e.requestFullscreen||e.webkitRequestFullscreen||(()=>{})).call(e);}else{document.exitFullscreen&&document.exitFullscreen();}};
+const VERSAO="6";
+async function checarVersao(){try{const r=await fetch("versao.txt?"+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
+  if(v&&v!==VERSAO)location.replace(location.pathname+"?v="+v+location.hash);}catch(e){}}
+setInterval(checarVersao,120000); setTimeout(checarVersao,4000);
 aplicarTema(); tick(); setInterval(tick,15000);
 </script>
 </body>
