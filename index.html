@@ -151,6 +151,8 @@ svg text{font-family:Barlow,system-ui,sans-serif}
 .tk .it em{font-style:normal;color:var(--mut2);font-variant-numeric:tabular-nums;margin-right:6px}
 .tk .it i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:1px;background:var(--warn)}
 .tk .it.f i{background:var(--flavio)} .tk .it.l i{background:var(--lula)}
+.tk .it.a i{background:var(--ok)}
+.tk .it em.an{color:var(--ok);font-weight:700;letter-spacing:.06em;font-size:.82em}
 @keyframes rolar{from{transform:translateX(0)}to{transform:translateX(-100%)}}
 
 body.com-tk .app{padding-bottom:calc(env(safe-area-inset-bottom) + 74px)}
@@ -509,11 +511,11 @@ function selo(d){
 }
 
 // ===== barra de notícias: letreiro contínuo (não reinicia quando chega notícia nova)
-const TK={fila:[],idx:0,x:null,last:0,assin:"",rodando:false};
+const TK={fila:[],idx:0,x:null,last:0,assin:"",assinN:"",giro:0,rodando:false};
 const tkEsc=t=>String(t).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 function tkVel(){const lento=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;return (innerWidth>=1100?120:85)*(lento?0.5:1);}
 function tkNovo(){const n=TK.fila[TK.idx%TK.fila.length];TK.idx++;const s=document.createElement("span");s.className="it "+n.tipo;
-  s.innerHTML=`<i></i><em>${tkEsc(n.h)}</em>${tkEsc(n.txt)}`;return s;}
+  s.innerHTML=`<i></i><em${n.h==="ANÁLISE"?' class="an"':""}>${tkEsc(n.h)}</em>${tkEsc(n.txt)}`;return s;}
 function tkEncher(){const tr=$("tk-rolo"),W=tr.parentElement.clientWidth;let g=0;
   while(TK.fila.length&&tr.scrollWidth+TK.x<W*2&&g++<30)tr.appendChild(tkNovo());}
 function tkPasso(t){
@@ -528,13 +530,17 @@ function tkPasso(t){
   requestAnimationFrame(tkPasso);
 }
 function ticker(d){
-  const ns=(d.noticias||[]).slice().reverse().slice(0,12);
+  const ns=(d.noticias||[]).slice().reverse().slice(0,8), an=(d.analises||[]).slice();
   const el=$("tk");
-  if(!ns.length){el.hidden=true;document.body.classList.remove("com-tk");return;}
+  if(!ns.length&&!an.length){el.hidden=true;document.body.classList.remove("com-tk");return;}
   el.hidden=false; document.body.classList.add("com-tk");
-  const assin=ns.map(n=>n.h+n.txt).join("|"); if(assin===TK.assin) return;
-  const novas=TK.assin?ns.filter(n=>!TK.assin.includes(n.h+n.txt)).length:0;
-  TK.assin=assin; TK.fila=ns; if(novas) TK.idx=0;   // a mais nova entra logo depois do que está passando
+  // intercala: notícia, análise, notícia, análise… (análises seguem rodando depois do fim da apuração)
+  const fila=[]; const n=Math.max(ns.length,an.length);
+  for(let i=0;i<n;i++){ if(i<ns.length)fila.push(ns[i]); if(i<an.length)fila.push(an[(i+TK.giro)%an.length]); }
+  const assinN=ns.map(x=>x.h+x.txt).join("|"), assin=assinN+"#"+an.map(x=>x.txt).join("|");
+  if(assin===TK.assin) return;
+  const novas=TK.assinN?ns.filter(x=>!TK.assinN.includes(x.h+x.txt)).length:0;
+  TK.assin=assin; TK.assinN=assinN; TK.fila=fila; if(novas) TK.idx=0;
   if(!TK.rodando){TK.rodando=true;requestAnimationFrame(tkPasso);}
 }
 
@@ -640,7 +646,7 @@ setInterval(()=>{
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)tick();});
 window.addEventListener("hashchange",()=>location.reload());
 $("cheia").onclick=()=>{const e=document.documentElement; if(!document.fullscreenElement){(e.requestFullscreen||e.webkitRequestFullscreen||(()=>{})).call(e);}else{document.exitFullscreen&&document.exitFullscreen();}};
-const VERSAO="8";
+const VERSAO="9";
 async function checarVersao(){try{const r=await fetch("versao.txt?"+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==VERSAO){const q=new URLSearchParams(location.search);q.set("v",v);location.replace(location.pathname+"?"+q.toString()+location.hash);}}catch(e){}}
 setInterval(checarVersao,120000); setTimeout(checarVersao,4000);
