@@ -146,13 +146,13 @@ svg text{font-family:Barlow,system-ui,sans-serif}
 .tk .rot{flex:none;display:flex;align-items:center;padding:0 12px;color:#fff;font-family:"Barlow Condensed",-apple-system,system-ui,sans-serif;font-weight:700;font-size:14px;letter-spacing:.08em;
   background:linear-gradient(90deg,var(--lula),var(--flavio))}
 .tk .trilho{flex:1;overflow:hidden;white-space:nowrap;padding:11px 0;font-size:15px}
-.tk .rolo{display:inline-block;padding-left:100%;animation:rolar 60s linear infinite;will-change:transform}
-.tk .it{margin-right:46px}
+.tk .rolo{display:inline-block;will-change:transform}
+.tk .it{padding-right:46px;display:inline-block}
 .tk .it em{font-style:normal;color:var(--mut2);font-variant-numeric:tabular-nums;margin-right:6px}
 .tk .it i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:1px;background:var(--warn)}
 .tk .it.f i{background:var(--flavio)} .tk .it.l i{background:var(--lula)}
 @keyframes rolar{from{transform:translateX(0)}to{transform:translateX(-100%)}}
-@media (prefers-reduced-motion:reduce){.tk .rolo{animation:none;padding-left:12px}}
+
 body.com-tk .app{padding-bottom:calc(env(safe-area-inset-bottom) + 74px)}
 @media (min-width:1100px){.tk .trilho{font-size:20px;padding:14px 0}.tk .rot{font-size:18px;padding:0 18px}}
 @media (max-width:1099px){.cand .pc{font-size:clamp(36px,11vw,54px)}}
@@ -403,22 +403,34 @@ function selo(d){
   $("selo-s").innerHTML=s;
 }
 
-// ===== barra de notícias
-let tkAssin="";
+// ===== barra de notícias: letreiro contínuo (não reinicia quando chega notícia nova)
+const TK={fila:[],idx:0,x:null,last:0,assin:"",rodando:false};
+const tkEsc=t=>String(t).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+function tkVel(){const lento=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;return (innerWidth>=1100?120:85)*(lento?0.5:1);}
+function tkNovo(){const n=TK.fila[TK.idx%TK.fila.length];TK.idx++;const s=document.createElement("span");s.className="it "+n.tipo;
+  s.innerHTML=`<i></i><em>${tkEsc(n.h)}</em>${tkEsc(n.txt)}`;return s;}
+function tkEncher(){const tr=$("tk-rolo"),W=tr.parentElement.clientWidth;let g=0;
+  while(TK.fila.length&&tr.scrollWidth+TK.x<W*2&&g++<30)tr.appendChild(tkNovo());}
+function tkPasso(t){
+  const tr=$("tk-rolo"); const dt=TK.last?Math.min(0.1,(t-TK.last)/1000):0; TK.last=t;
+  if(TK.fila.length){
+    if(TK.x===null)TK.x=tr.parentElement.clientWidth;
+    TK.x-=tkVel()*dt;
+    let f=tr.firstElementChild;
+    while(f&&TK.x+f.offsetWidth<0){TK.x+=f.offsetWidth;tr.removeChild(f);f=tr.firstElementChild;}
+    tkEncher(); tr.style.transform=`translate3d(${TK.x}px,0,0)`;
+  }
+  requestAnimationFrame(tkPasso);
+}
 function ticker(d){
-  const ns=(d.noticias||[]).slice().reverse();
+  const ns=(d.noticias||[]).slice().reverse().slice(0,12);
   const el=$("tk");
   if(!ns.length){el.hidden=true;document.body.classList.remove("com-tk");return;}
   el.hidden=false; document.body.classList.add("com-tk");
-  const assin=ns.map(n=>n.h+n.txt).join("|"); if(assin===tkAssin) return; tkAssin=assin;
-  const esc=t=>String(t).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
-  const lista=ns.slice(0,12);
-  const r=$("tk-rolo");
-  r.innerHTML=lista.map(n=>`<span class="it ${n.tipo}"><i></i><em>${esc(n.h)}</em>${esc(n.txt)}</span>`).join("");
-  const chars=lista.reduce((a,n)=>a+n.txt.length+12,0);
-  r.style.animationDuration=Math.max(25,Math.round(chars*0.16))+"s";
-  r.style.animation="none"; void r.offsetWidth; r.style.animation="";
-  r.style.animationDuration=Math.max(25,Math.round(chars*0.16))+"s";
+  const assin=ns.map(n=>n.h+n.txt).join("|"); if(assin===TK.assin) return;
+  const novas=TK.assin?ns.filter(n=>!TK.assin.includes(n.h+n.txt)).length:0;
+  TK.assin=assin; TK.fila=ns; if(novas) TK.idx=0;   // a mais nova entra logo depois do que está passando
+  if(!TK.rodando){TK.rodando=true;requestAnimationFrame(tkPasso);}
 }
 
 let ultPst=null;
