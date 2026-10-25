@@ -248,7 +248,7 @@ body.com-tk .app{padding-bottom:calc(env(safe-area-inset-bottom) + 74px)}
     <div style="margin-top:10px">
       <div class="kv"><span>Projeção Flávio</span><b class="flavio" id="kf">—</b></div>
       <div class="kv"><span>Projeção Lula</span><b class="lula" id="kl">—</b></div>
-      <div class="kv"><span>Projeção do painel antes da votação</span><b id="kpre">revelada com os primeiros votos</b></div>
+      <div class="kv"><span>Projeção do painel antes da votação</span><b id="kpre">revelada às 19h</b></div>
       <div class="kv"><span>Flávio vs 1º turno (mesmos locais)</span><b id="k1">—</b></div>
       <div class="kv"><span>Flávio vs Bolsonaro 2022 (mesmos locais)</span><b id="k22">—</b></div>
       <div class="kv"><span>Municípios já no modelo</span><b id="kn">—</b></div>
@@ -596,7 +596,8 @@ function confete(cor){
 // ===== projeção do painel antes da votação (revelada às 17h, quando fecham as urnas)
 const PRE={f:0.518,lo:0.495,hi:0.540,p:0.80,quando:"22/10"};
 const PREVIA=new URLSearchParams(location.search).get("previa")==="dj";
-const REVELA=PREVIA?0:Infinity; // revela quando o TSE começar a divulgar os votos
+const PRORROGA=Date.parse("2026-10-25T19:00:00-03:00"); // votação prorrogada pelo STF até 19h
+const REVELA=PREVIA?0:PRORROGA;
 let PRE_ESTADO=false;
 function faltaTxt(ms){const m=Math.ceil(ms/60000),h=Math.floor(m/60),r=m%60;return h?`${h}h${String(r).padStart(2,"0")}min`:`${r} min`;}
 function telaPre(){
@@ -604,9 +605,10 @@ function telaPre(){
   $("fb").style.width="0"; $("fp").style.visibility=agora<REVELA?"hidden":"visible"; $("selo").className="selo espera";
   $("k1").textContent="—"; $("k22").textContent="—"; $("kn").textContent="—";
   if(agora<REVELA){
-    $("ver").innerHTML=`A projeção do Painel do DJ será revelada assim que o TSE começar a divulgar os votos.`;
-    gauge(null); $("gn").textContent="em breve"; $("gn").className="n"; $("gs").textContent="aguardando a divulgação do TSE";
-    $("kf").textContent="em breve"; $("kl").textContent="em breve"; $("cl").textContent="Lula —"; $("cf").textContent="Flávio —";
+    $("ver").innerHTML=`Votação prorrogada até as 19h (decisão do STF). A projeção do Painel do DJ será revelada quando a votação terminar.`;
+    gauge(null); $("gn").textContent=faltaTxt(REVELA-agora); $("gn").className="n"; $("gs").textContent="para o fim da votação";
+    if(!document.getElementById("av-prorroga")) $("avisos").insertAdjacentHTML("beforeend",`<div class="aviso" id="av-prorroga">Votação prorrogada até as 19h em todo o país. O TSE pausou a divulgação: os números parciais (0,25%, sobretudo exterior e Norte) não representam o resultado.</div>`);
+    $("kf").textContent="às 19h"; $("kl").textContent="às 19h"; $("cl").textContent="Lula —"; $("cf").textContent="Flávio —";
   } else {
     $("ver").innerHTML=`Antes da apuração, o Painel do DJ projeta: <span class="flavio">Flávio ${pct(PRE.f)}</span> x <span class="lula">Lula ${pct(1-PRE.f)}</span>`;
     gauge(PRE.p); $("gn").textContent=pct(PRE.p,0); $("gn").className="n flavio"; $("gs").textContent="chance de Flávio vencer (antes da apuração)";
@@ -617,8 +619,10 @@ function telaPre(){
   }
   kpre();
 }
-function kpre(){$("kpre").innerHTML=(PRE_ESTADO&&Date.now()<REVELA)?"revelada com os primeiros votos":`<span class="flavio">Flávio ${pct(PRE.f)}</span> · <span class="lula">Lula ${pct(1-PRE.f)}</span>`;}
-setInterval(()=>{ if(PRE_ESTADO) telaPre(); else kpre(); },1000);
+function kpre(){$("kpre").innerHTML=(Date.now()<REVELA)?"revelada às 19h":`<span class="flavio">Flávio ${pct(PRE.f)}</span> · <span class="lula">Lula ${pct(1-PRE.f)}</span>`;}
+setInterval(()=>{
+  if(PRE_ESTADO&&Date.now()>=REVELA&&D&&D.br&&D.br.vv){PRE_ESTADO=false;$("fp").style.visibility="visible";const a=document.getElementById("av-prorroga");if(a)a.remove();render(D);}
+  if(PRE_ESTADO) telaPre(); else kpre(); },1000);
 
 let ultPst=null;
 function render(d){
@@ -662,7 +666,7 @@ async function tick(){
     carimbo=rows2[0].atualizado; atualizado=Date.parse(carimbo)||atualizado;
     render(rows2[0].dados);
     const dd=rows2[0].dados;
-    PRE_ESTADO=(!dd.br||!dd.br.vv); if(PRE_ESTADO) telaPre(); else $("fp").style.visibility="visible";
+    PRE_ESTADO=(!dd.br||!dd.br.vv)||Date.now()<REVELA; if(PRE_ESTADO) telaPre(); else {$("fp").style.visibility="visible";const a=document.getElementById("av-prorroga");if(a)a.remove();}
   } catch(e){ $("dot").className="dot off"; }
 }
 setInterval(()=>{
@@ -675,7 +679,7 @@ setInterval(()=>{
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)tick();});
 window.addEventListener("hashchange",()=>location.reload());
 $("cheia").onclick=()=>{const e=document.documentElement; if(!document.fullscreenElement){(e.requestFullscreen||e.webkitRequestFullscreen||(()=>{})).call(e);}else{document.exitFullscreen&&document.exitFullscreen();}};
-const VERSAO="14";
+const VERSAO="15";
 async function checarVersao(){try{const r=await fetch("versao.txt?"+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==VERSAO){const q=new URLSearchParams(location.search);q.set("v",v);location.replace(location.pathname+"?"+q.toString()+location.hash);}}catch(e){}}
 setInterval(checarVersao,120000); setTimeout(checarVersao,4000);
