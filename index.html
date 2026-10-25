@@ -595,7 +595,8 @@ function confete(cor){
 
 // ===== projeção do painel antes da votação (revelada às 17h, quando fecham as urnas)
 const PRE={f:0.518,lo:0.495,hi:0.540,p:0.80,quando:"22/10"};
-const REVELA=Date.parse("2026-10-25T17:00:00-03:00");
+const PREVIA=new URLSearchParams(location.search).get("previa")==="dj";
+const REVELA=PREVIA?0:Date.parse("2026-10-25T17:00:00-03:00");
 let PRE_ESTADO=false;
 function faltaTxt(ms){const m=Math.ceil(ms/60000),h=Math.floor(m/60),r=m%60;return h?`${h}h${String(r).padStart(2,"0")}min`:`${r} min`;}
 function telaPre(){
@@ -604,7 +605,7 @@ function telaPre(){
   $("k1").textContent="—"; $("k22").textContent="—"; $("kn").textContent="—";
   if(agora<REVELA){
     $("ver").innerHTML=`A projeção do Painel do DJ será revelada às 17h, quando fecham as urnas.`;
-    gauge(null); $("gn").textContent=faltaTxt(REVELA-agora); $("gn").className="n"; $("gs").textContent="para a revelação";
+    gauge(null); $("gn").textContent=faltaTxt(REVELA-agora); $("gn").className="n"; $("gs").textContent="para o início da apuração";
     $("kf").textContent="às 17h"; $("kl").textContent="às 17h"; $("cl").textContent="Lula —"; $("cf").textContent="Flávio —";
   } else {
     $("ver").innerHTML=`Antes da apuração, o Painel do DJ projeta: <span class="flavio">Flávio ${pct(PRE.f)}</span> x <span class="lula">Lula ${pct(1-PRE.f)}</span>`;
@@ -674,7 +675,7 @@ setInterval(()=>{
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)tick();});
 window.addEventListener("hashchange",()=>location.reload());
 $("cheia").onclick=()=>{const e=document.documentElement; if(!document.fullscreenElement){(e.requestFullscreen||e.webkitRequestFullscreen||(()=>{})).call(e);}else{document.exitFullscreen&&document.exitFullscreen();}};
-const VERSAO="11";
+const VERSAO="12";
 async function checarVersao(){try{const r=await fetch("versao.txt?"+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==VERSAO){const q=new URLSearchParams(location.search);q.set("v",v);location.replace(location.pathname+"?"+q.toString()+location.hash);}}catch(e){}}
 setInterval(checarVersao,120000); setTimeout(checarVersao,4000);
