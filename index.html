@@ -619,9 +619,9 @@ function telaPre(){
   }
   kpre();
 }
-function kpre(){$("kpre").innerHTML=(Date.now()<REVELA)?"revelada às 19h":`<span class="flavio">Flávio ${pct(PRE.f)}</span> · <span class="lula">Lula ${pct(1-PRE.f)}</span>`;}
+function kpre(){$("kpre").innerHTML=PRE_ESTADO?"revelada às 19h":`<span class="flavio">Flávio ${pct(PRE.f)}</span> · <span class="lula">Lula ${pct(1-PRE.f)}</span>`;}
 setInterval(()=>{
-  if(PRE_ESTADO&&Date.now()>=REVELA&&D&&D.br&&D.br.vv){PRE_ESTADO=false;$("fp").style.visibility="visible";const a=document.getElementById("av-prorroga");if(a)a.remove();render(D);}
+  if(PRE_ESTADO&&D&&D.br&&D.br.vv&&(Date.now()>=REVELA||D.br.pst>=0.01)){PRE_ESTADO=false;$("fp").style.visibility="visible";const a=document.getElementById("av-prorroga");if(a)a.remove();render(D);}
   if(PRE_ESTADO) telaPre(); else kpre(); },1000);
 
 let ultPst=null;
@@ -666,7 +666,7 @@ async function tick(){
     carimbo=rows2[0].atualizado; atualizado=Date.parse(carimbo)||atualizado;
     render(rows2[0].dados);
     const dd=rows2[0].dados;
-    PRE_ESTADO=(!dd.br||!dd.br.vv)||Date.now()<REVELA; if(PRE_ESTADO) telaPre(); else {$("fp").style.visibility="visible";const a=document.getElementById("av-prorroga");if(a)a.remove();}
+    PRE_ESTADO=(!dd.br||!dd.br.vv)||(Date.now()<REVELA&&!(dd.br.pst>=0.01)); // revela às 19h ou quando o TSE voltar a avançar if(PRE_ESTADO) telaPre(); else {$("fp").style.visibility="visible";const a=document.getElementById("av-prorroga");if(a)a.remove();}
   } catch(e){ $("dot").className="dot off"; }
 }
 setInterval(()=>{
@@ -679,7 +679,7 @@ setInterval(()=>{
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)tick();});
 window.addEventListener("hashchange",()=>location.reload());
 $("cheia").onclick=()=>{const e=document.documentElement; if(!document.fullscreenElement){(e.requestFullscreen||e.webkitRequestFullscreen||(()=>{})).call(e);}else{document.exitFullscreen&&document.exitFullscreen();}};
-const VERSAO="15";
+const VERSAO="16";
 async function checarVersao(){try{const r=await fetch("versao.txt?"+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==VERSAO){const q=new URLSearchParams(location.search);q.set("v",v);location.replace(location.pathname+"?"+q.toString()+location.hash);}}catch(e){}}
 setInterval(checarVersao,120000); setTimeout(checarVersao,4000);
