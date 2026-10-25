@@ -530,8 +530,36 @@ function tkPasso(t){
   }
   requestAnimationFrame(tkPasso);
 }
+// análises do comentarista montadas na própria página, a partir do resumo (não depende do Mac)
+function anlCliente(d){
+  const out=[], p=d.proj, b=d.br; if(PRE_ESTADO||!p||!b||!b.vv) return out;
+  const P=x=>pct(x), D=x=>(x>=0?"+":"−")+Math.abs(x*100).toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1});
+  const A=(txt,tipo)=>out.push({h:"ANÁLISE",txt,tipo});
+  const lid=p.proj>=0.5?"Flávio":"Lula", ch=p.proj>=0.5?p.p:1-p.p, tL=lid==="Lula"?"l":"f";
+  A(`Projeção do Painel do DJ com ${pct(b.pst,1)} apurado: Lula ${P(1-p.proj)} x Flávio ${P(p.proj)} no resultado final (faixa de 90%: Flávio de ${P(p.lo)} a ${P(p.hi)}). Chance de ${lid} vencer: ${pct(ch,0)}`,tL);
+  const dif=b.lula-b.flavio;
+  A(`Nas urnas: ${dif>=0?"Lula":"Flávio"} lidera por ${num(Math.abs(dif))} votos, com ${pct(1-b.pst,1)} das urnas ainda por apurar`,dif>=0?"l":"f");
+  if(p.d1t!=null) A(`Raio-X: nos mesmos municípios já apurados, Flávio ${p.d1t>=0?"cresce":"recua"} ${D(p.d1t)} p.p. sobre o 1º turno`,p.d1t>=0?"f":"l");
+  if(p.d22!=null) A(`Comparação com 2022: nos mesmos municípios, Flávio está ${Math.abs(p.d22*100).toLocaleString("pt-BR",{maximumFractionDigits:1,minimumFractionDigits:1})} p.p. ${p.d22>=0?"acima":"abaixo"} do que Bolsonaro fez no 2º turno de 2022`,p.d22>=0?"f":"l");
+  const us=(d.ufs||[]).filter(u=>u.uf!=="zz");
+  const est=us.filter(u=>u.d1t!=null&&u.pst>=0.15);
+  if(est.length>=5){const sobe=est.filter(u=>u.d1t>0).length;const mx=est.reduce((a,c)=>c.d1t>a.d1t?c:a),mn=est.reduce((a,c)=>c.d1t<a.d1t?c:a);
+    A(`Estados: Flávio cresce sobre o 1º turno em ${sobe} de ${est.length} estados com apuração avançada. Maior alta em ${mx.nome} (${D(mx.d1t)} p.p.), menor em ${mn.nome} (${D(mn.d1t)} p.p.)`,sobe>=est.length/2?"f":"l");}
+  const cp=us.filter(u=>u.proj!=null);
+  if(cp.length>=20){const nf=cp.filter(u=>u.proj>=0.5).length;A(`Mapa: pela projeção, Flávio vence em ${nf} estados e Lula em ${cp.length-nf}`,nf>cp.length-nf?"f":"l");}
+  ["sp","mg","rj","ba","pr","rs","pe","ce","sc","go"].forEach(k=>{const u=us.find(x=>x.uf===k);
+    if(!u||u.f==null||u.pst<0.05||u.proj==null) return;
+    let t=`${u.nome}: Flávio com ${P(u.f)} nas urnas (${pct(u.pst,0)} apurado)`;
+    if(u.d1t!=null) t+=`, ${D(u.d1t)} p.p. sobre o 1º turno nos mesmos municípios`;
+    t+=`; projeção no estado: Flávio ${P(u.proj)}`; A(t,u.proj>=0.5?"f":"l");});
+  const R=d.regs||{};
+  [["r:NE","Nordeste"],["r:N","Norte"],["r:SE","Sudeste"],["r:S","Sul"],["r:CO","Centro-Oeste"]].forEach(([k,nm])=>{const r=R[k];
+    if(r&&r.proj!=null&&r.f1!=null) A(`${nm}: projeção de Flávio ${P(r.proj)} na região; no 1º turno ele teve ${P(r.f1)} (${D(r.proj-r.f1)} p.p.)`,r.proj>=0.5?"f":"l");});
+  const m=d.modelo; if(m&&m.rho&&m.n_obs>=300) A(`Comparecimento: nos municípios apurados, os votos válidos somam ${P(m.rho)} do que foram no 1º turno`,"a");
+  return out;
+}
 function ticker(d){
-  const ns=(d.noticias||[]).slice().reverse().slice(0,8), an=(d.analises||[]).slice();
+  const ns=(d.noticias||[]).slice().reverse().slice(0,8), an=anlCliente(d).concat(d.analises||[]);
   const el=$("tk");
   if(!ns.length&&!an.length){el.hidden=true;document.body.classList.remove("com-tk");return;}
   el.hidden=false; document.body.classList.add("com-tk");
@@ -679,7 +707,7 @@ setInterval(()=>{
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)tick();});
 window.addEventListener("hashchange",()=>location.reload());
 $("cheia").onclick=()=>{const e=document.documentElement; if(!document.fullscreenElement){(e.requestFullscreen||e.webkitRequestFullscreen||(()=>{})).call(e);}else{document.exitFullscreen&&document.exitFullscreen();}};
-const VERSAO="16";
+const VERSAO="17";
 async function checarVersao(){try{const r=await fetch("versao.txt?"+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==VERSAO){const q=new URLSearchParams(location.search);q.set("v",v);location.replace(location.pathname+"?"+q.toString()+location.hash);}}catch(e){}}
 setInterval(checarVersao,120000); setTimeout(checarVersao,4000);
