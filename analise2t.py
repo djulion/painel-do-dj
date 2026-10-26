@@ -16,7 +16,20 @@ UFS = ["ac", "al", "am", "ap", "ba", "ce", "df", "es", "go", "ma", "mg", "ms", "
        "pb", "pe", "pi", "pr", "rj", "rn", "ro", "rr", "rs", "sc", "se", "sp", "to", "zz"]
 SUPA_URL = "https://ihwdycrujrvpwvjfcioy.supabase.co"
 SUPA_KEY = "sb_publishable_-fE5D8rarCcGXt1FHHf5TA_SRIOZ483"
-SUPA_TOKEN = "a453b36a4d9520971abce1f32cfe31cc1eeb"
+
+
+def _token():
+    """O token de publicação fica só no servidor2.py deste Mac (não vai para o GitHub)."""
+    import re
+    try:
+        with open(os.path.join(AQUI, "servidor2.py"), encoding="utf-8") as f:
+            m = re.search(r'SUPA_TOKEN\s*=\s*"([^"]+)"', f.read())
+        return m.group(1) if m else ""
+    except Exception:
+        return ""
+
+
+SUPA_TOKEN = _token()
 H = {"User-Agent": "PainelApuracaoPessoal/2.0-analise", "Accept-Encoding": "identity"}
 
 try:
@@ -123,6 +136,8 @@ def main():
                 return json.load(f)
         except Exception:
             return {}
+    if not SUPA_TOKEN:
+        log("Não achei o servidor2.py nesta pasta. Rode o comando dentro da pasta do painel."); return
     b22 = ler("base_mun_2022_t1t2.json")
     nomes = ler("nomes_mun.json")
     log(f"Base de 2022 no cache: {sum(len(v) for v in b22.values())} municípios")
