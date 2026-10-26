@@ -692,9 +692,9 @@ async function tick(){
     const r2=await fetch(`${SUPA}/rest/v1/painel?id=eq.${PID}&select=dados,atualizado`,h);
     if(!r2.ok) throw 0; const rows2=await r2.json(); if(!rows2.length) return;
     carimbo=rows2[0].atualizado; atualizado=Date.parse(carimbo)||atualizado;
-    render(rows2[0].dados);
     const dd=rows2[0].dados;
     PRE_ESTADO=(!dd.br||!dd.br.vv)||(Date.now()<REVELA&&!(dd.br.pst>=0.01)); // revela às 19h ou quando o TSE voltar a avançar if(PRE_ESTADO) telaPre(); else {$("fp").style.visibility="visible";const a=document.getElementById("av-prorroga");if(a)a.remove();}
+    render(dd);
   } catch(e){ $("dot").className="dot off"; }
 }
 setInterval(()=>{
@@ -707,7 +707,7 @@ setInterval(()=>{
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)tick();});
 window.addEventListener("hashchange",()=>location.reload());
 $("cheia").onclick=()=>{const e=document.documentElement; if(!document.fullscreenElement){(e.requestFullscreen||e.webkitRequestFullscreen||(()=>{})).call(e);}else{document.exitFullscreen&&document.exitFullscreen();}};
-const VERSAO="17";
+const VERSAO="18";
 async function checarVersao(){try{const r=await fetch("versao.txt?"+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.text()).trim();
   if(v&&v!==VERSAO){const q=new URLSearchParams(location.search);q.set("v",v);location.replace(location.pathname+"?"+q.toString()+location.hash);}}catch(e){}}
 setInterval(checarVersao,120000); setTimeout(checarVersao,4000);
